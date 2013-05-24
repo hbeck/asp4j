@@ -1,0 +1,21 @@
+TODO
+
+* architecture
+  - generic abstraction over low-level asp
+  - annotation driven
+  - terms
+  - access of lower level
+* solvers
+  - potassco
+  - smodels
+* demo programs
+  - with lombok 
+* checks
+  - lowercase input
+  - getter/setter reflection
+  - arg count
+
+NOTES
+
+modelling example: osm http://en.wikipedia.org/wiki/OpenStreetMap#Data_format
+
