@@ -5,15 +5,19 @@ TODO
   - annotation driven
   - terms
   - access of lower level
+  - annotation-based
+    - setter/getter curr only string. mapping of objects to Ids?
 * solvers
   - potassco
   - smodels
 * demo programs
-  - with lombok 
+  - with lombok
+  - semweb with mapping instead of urn:bla
 * checks
   - lowercase input
   - getter/setter reflection
   - arg count
+  - solver dlv: error handling    
 
 NOTES
 

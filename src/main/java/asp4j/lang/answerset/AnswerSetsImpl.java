@@ -7,9 +7,8 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * 
- * @author hbeck
- * date 2013-05-19
+ *
+ * @author hbeck date 2013-05-19
  */
 public class AnswerSetsImpl<T> implements AnswerSets<T> {
 
@@ -23,9 +22,11 @@ public class AnswerSetsImpl<T> implements AnswerSets<T> {
     public Set<T> cautiousConsequence() {
         Iterator<AnswerSet<T>> it = answerSets.iterator();
         Set<T> intersection = new HashSet();
-        intersection.addAll(it.next().atoms());
-        while (it.hasNext()) {
-            intersection.retainAll(it.next().atoms());
+        if (it.hasNext()) {
+            intersection.addAll(it.next().atoms());
+            while (it.hasNext()) {
+                intersection.retainAll(it.next().atoms());
+            }
         }
         return Collections.unmodifiableSet(intersection);
     }
