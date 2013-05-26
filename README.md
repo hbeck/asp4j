@@ -47,8 +47,7 @@ Person person = new Person("id42");
 
 ObjectSolver solver = new ObjectSolverImpl(new SolverDLV());
 
-//"person.lp"
-Program<Object> program = new ProgramBuilder().add(new File(rulefile)).add(person).build();
+Program<Object> program = new ProgramBuilder().add(new File("person.lp")).add(person).build();
 FilterBinding binding = new FilterBinding().add(Male.class).add(Female.class);
 List<AnswerSet<Object>> answerSets = solver.getAnswerSets(program, binding);
 
