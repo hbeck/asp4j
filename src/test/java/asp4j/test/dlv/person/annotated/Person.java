@@ -1,14 +1,15 @@
 package asp4j.test.dlv.person.annotated;
 
 import asp4j.mapping.annotations.Arg;
-import asp4j.mapping.annotations.Atomname;
+import asp4j.mapping.annotations.Predicate;
 import java.util.Objects;
 
 /**
  *
- * @author hbeck date May 23, 2013
+ * @author hbeck
+ * date May 23, 2013
  */
-@Atomname("person")
+@Predicate("person")
 public class Person {
 
     protected String id;

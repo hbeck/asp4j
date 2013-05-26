@@ -1,14 +1,15 @@
 package asp4j.test.dlv.tripleupdate.annotated;
 
-import asp4j.mapping.annotations.Atomname;
+import asp4j.mapping.annotations.Predicate;
 import java.util.Objects;
 import org.openrdf.model.Statement;
 
 /**
  *
- * @author hbeck date May 14, 2013
+ * @author hbeck 
+ * date May 14, 2013
  */
-@Atomname("add")
+@Predicate("add")
 public class Addition extends TypedTriple {
 
     public Addition() {

@@ -10,6 +10,6 @@ import asp4j.program.Program;
  */
 public interface ObjectSolver {
     
-    <In,Out> AnswerSets<Out> getAnswerSets(Program<In> program, FilterBinding<Out> binding) throws Exception;
+    <T> AnswerSets<Object> getAnswerSets(Program<T> program, FilterBinding binding) throws Exception;
 
 }

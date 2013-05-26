@@ -26,12 +26,12 @@ public class ObjectSolverImpl implements ObjectSolver {
     }
 
     @Override
-    public <In, Out> AnswerSets<Out> getAnswerSets(Program<In> program, FilterBinding<Out> binding) throws Exception {
+    public <T> AnswerSets<Object> getAnswerSets(Program<T> program, FilterBinding binding) throws Exception {
         List<AnswerSet<Atom>> answerSets = lowLevelAnswerSets(program);
         Collection<String> predicateNames = binding.getFilterPredicateNames();
-        List<AnswerSet<Out>> list = new ArrayList();
+        List<AnswerSet<Object>> list = new ArrayList();
         for (AnswerSet<Atom> answerSet : answerSets) {
-            Collection<Out> as = new ArrayList();
+            Collection<Object> as = new ArrayList();
             for (Atom atom : answerSet.atoms()) {
                 if (predicateNames.contains(atom.predicateName())) {
                     as.add(binding.asObject(atom));

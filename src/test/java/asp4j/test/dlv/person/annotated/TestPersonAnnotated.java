@@ -1,27 +1,21 @@
 package asp4j.test.dlv.person.annotated;
 
-import asp4j.lang.answerset.AnswerSet;
 import asp4j.lang.answerset.AnswerSets;
-import asp4j.mapping.direct.ObjectAtom;
-import asp4j.mapping.direct.OutputAtom;
 import asp4j.program.ProgramBuilder;
 import asp4j.solver.SolverDLV;
-import asp4j.solver.object.ObjectBinding;
+import asp4j.solver.object.FilterBindingImpl;
 import asp4j.solver.object.ObjectSolver;
 import asp4j.solver.object.ObjectSolverImpl;
-import asp4j.solver.object.OutputAtomBinding;
 import java.io.File;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
-import static org.junit.Assert.fail;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
 /**
  *
- * @author hbeck date 2013-05-20
+ * @author hbeck
+ * date 2013-05-20
  */
 public class TestPersonAnnotated {
 
@@ -57,7 +51,7 @@ public class TestPersonAnnotated {
         ProgramBuilder<Object> builder = new ProgramBuilder();
         builder.add(new File(rulefile)).add(person);
 
-        ObjectBinding binding = new ObjectBinding();
+        FilterBindingImpl binding = new FilterBindingImpl();
         binding.add(Male.class).add(Female.class);
 
         AnswerSets<Object> answerSets = objectSolver.getAnswerSets(builder.build(), binding);

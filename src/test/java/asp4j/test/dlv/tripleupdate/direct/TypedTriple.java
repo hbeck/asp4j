@@ -1,8 +1,8 @@
-package asp4j.test.dlv.tripleupdate.wrapped;
+package asp4j.test.dlv.tripleupdate.direct;
 
 import asp4j.lang.Atom;
 import asp4j.lang.AtomImpl;
-import asp4j.mapping.direct.ObjectAtom;
+import asp4j.mapping.direct.CanAsAtom;
 import java.util.Objects;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
@@ -11,9 +11,10 @@ import org.openrdf.model.impl.URIImpl;
 
 /**
  *
- * @author hbeck date May 14, 2013
+ * @author hbeck 
+ * date May 14, 2013
  */
-public abstract class TypedTriple implements ObjectAtom {
+public abstract class TypedTriple implements CanAsAtom {
 
     protected Statement statement;
 

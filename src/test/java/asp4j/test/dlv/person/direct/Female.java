@@ -1,10 +1,11 @@
-package asp4j.test.dlv.person.wrapped;
+package asp4j.test.dlv.person.direct;
 
 import java.util.Objects;
 
 /**
  *
- * @author hbeck date May 20, 2013
+ * @author hbeck 
+ * date May 20, 2013
  */
 public class Female extends Person {
 

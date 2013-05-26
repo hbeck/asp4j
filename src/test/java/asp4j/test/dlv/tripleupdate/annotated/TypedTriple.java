@@ -9,7 +9,8 @@ import org.openrdf.model.impl.URIImpl;
 
 /**
  *
- * @author hbeck date May 24, 2013
+ * @author hbeck 
+ * date May 24, 2013
  */
 public abstract class TypedTriple {
 

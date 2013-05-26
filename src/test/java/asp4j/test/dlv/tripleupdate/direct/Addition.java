@@ -1,15 +1,15 @@
-package asp4j.test.dlv.tripleupdate.wrapped;
+package asp4j.test.dlv.tripleupdate.direct;
 
-import asp4j.mapping.direct.OutputAtom;
-import asp4j.test.dlv.person.wrapped.Person;
+import asp4j.mapping.direct.CanInitFromAtom;
 import java.util.Objects;
 import org.openrdf.model.Statement;
 
 /**
  *
- * @author hbeck date May 14, 2013
+ * @author hbeck 
+ * date May 14, 2013
  */
-public class Addition extends TypedTriple implements OutputAtom {
+public class Addition extends TypedTriple implements CanInitFromAtom {
 
     public Addition() {
     }

@@ -1,7 +1,7 @@
-package asp4j.test.dlv.tripleupdate.wrapped;
+package asp4j.test.dlv.tripleupdate.direct;
 
 import asp4j.lang.Atom;
-import asp4j.mapping.direct.OutputAtom;
+import asp4j.mapping.direct.CanInitFromAtom;
 import java.util.Objects;
 import org.openrdf.model.Statement;
 import org.openrdf.model.impl.StatementImpl;
@@ -9,9 +9,10 @@ import org.openrdf.model.impl.URIImpl;
 
 /**
  *
- * @author hbeck date May 21, 2013
+ * @author hbeck 
+ * date May 21, 2013
  */
-public class Conflict implements OutputAtom {
+public class Conflict implements CanInitFromAtom {
 
     private String type;
     private Statement statement1;

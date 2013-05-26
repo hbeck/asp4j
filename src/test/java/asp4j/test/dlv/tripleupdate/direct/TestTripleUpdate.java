@@ -1,16 +1,17 @@
-package asp4j.test.dlv.tripleupdate.wrapped;
+package asp4j.test.dlv.tripleupdate.direct;
 
 import asp4j.lang.Atom;
 import asp4j.lang.AtomImpl;
 import asp4j.lang.answerset.AnswerSets;
-import asp4j.mapping.direct.ObjectAtom;
-import asp4j.mapping.direct.OutputAtom;
+import asp4j.mapping.direct.CanAsAtom;
+import asp4j.mapping.direct.CanInitFromAtom;
 import asp4j.program.ProgramBuilder;
 import asp4j.solver.Solver;
 import asp4j.solver.SolverDLV;
+import asp4j.solver.object.FilterBinding;
+import asp4j.solver.object.FilterBindingImpl;
 import asp4j.solver.object.ObjectSolver;
 import asp4j.solver.object.ObjectSolverImpl;
-import asp4j.solver.object.OutputAtomBinding;
 import java.io.File;
 import java.util.Set;
 import org.apache.commons.collections.CollectionUtils;
@@ -23,7 +24,8 @@ import org.openrdf.model.impl.URIImpl;
 
 /**
  *
- * @author hbeck date 2013-05-14
+ * @author hbeck 
+ * date 2013-05-14
  */
 public class TestTripleUpdate {
 
@@ -61,9 +63,6 @@ public class TestTripleUpdate {
         assertTrue(cons.contains(AtomImpl.parse("add(blue,colorOf,car)")));
         assertEquals(1, as.asList().size());
 
-//        for (Atom atom : cons) {
-//            System.out.println(atom);
-//        }
     }
 
     @Test
@@ -75,30 +74,20 @@ public class TestTripleUpdate {
 
         ObjectSolver objectSolver = new ObjectSolverImpl(new SolverDLV());
 
-        ProgramBuilder<ObjectAtom> builder = new ProgramBuilder();
+        ProgramBuilder<CanAsAtom> builder = new ProgramBuilder();
         builder.add(new File(rulefile))
                 .add(new Addition(car_hasColor_blue))
                 .add(new Addition(hasColor_inverseOf_colorOf));
 
-        OutputAtomBinding binding = new OutputAtomBinding();
+        FilterBinding binding = new FilterBindingImpl();
         binding.add(Addition.class);
 
-        AnswerSets<OutputAtom> as = objectSolver.getAnswerSets(builder.build(), binding);
+        AnswerSets<Object> as = objectSolver.getAnswerSets(builder.build(), binding);
 
         assertTrue(CollectionUtils.isEqualCollection(as.braveConsequence(), as.cautiousConsequence()));
         assertTrue(as.asList().get(0).atoms().contains(new Addition(blue_colorOf_car)));
         assertEquals(1, as.asList().size());
 
-//        for (AnswerSet<OutputAtom> x : oas.asList()) {
-//            for (OutputAtom a : x.atoms()) {
-//                System.out.println(a);
-//            }
-//        }
-//        System.out.println("-");
-//        Set<OutputAtom> filtered = oas.asList().get(0).filter(ASPUtils.classFilter(Addition.class));
-//        for (OutputAtom so : filtered) {
-//            System.out.println(so);
-//        }
     }
 
     @Test
@@ -123,18 +112,18 @@ public class TestTripleUpdate {
 
         ObjectSolver objectSolver = new ObjectSolverImpl(new SolverDLV());
 
-        ProgramBuilder<ObjectAtom> builder = new ProgramBuilder();
+        ProgramBuilder<CanAsAtom> builder = new ProgramBuilder();
         builder.add(new File(rulefile))
                 .add(new InDatabase(hasColor_inverseOf_colorOf))
                 .add(new InDatabase(hasColor_type_single))
                 .add(new InDatabase(car_hasColor_blue))
                 .add(new InDatabase(blue_colorOf_car))
                 .add(new Addition(red_colorOf_car));
-
-        OutputAtomBinding binding = new OutputAtomBinding();
+        
+        FilterBinding binding = new FilterBindingImpl();
         binding.add(Conflict.class);
 
-        AnswerSets<OutputAtom> as = objectSolver.getAnswerSets(builder.build(), binding);
+        AnswerSets<Object> as = objectSolver.getAnswerSets(builder.build(), binding);
 
         assertTrue(CollectionUtils.isEqualCollection(as.braveConsequence(), as.cautiousConsequence()));
         Conflict expected = new Conflict();

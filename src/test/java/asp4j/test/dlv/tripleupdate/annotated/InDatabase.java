@@ -1,14 +1,15 @@
 package asp4j.test.dlv.tripleupdate.annotated;
 
-import asp4j.mapping.annotations.Atomname;
+import asp4j.mapping.annotations.Predicate;
 import java.util.Objects;
 import org.openrdf.model.Statement;
 
 /**
  *
- * @author hbeck date May 15, 2013
+ * @author hbeck 
+ * date May 15, 2013
  */
-@Atomname("db")
+@Predicate("db")
 public class InDatabase extends TypedTriple {
 
     public InDatabase() {

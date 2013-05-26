@@ -1,16 +1,14 @@
-package asp4j.test.dlv.person.wrapped;
+package asp4j.test.dlv.person.direct;
 
-import asp4j.lang.answerset.AnswerSet;
 import asp4j.lang.answerset.AnswerSets;
-import asp4j.mapping.direct.ObjectAtom;
-import asp4j.mapping.direct.OutputAtom;
+import asp4j.mapping.direct.CanAsAtom;
 import asp4j.program.ProgramBuilder;
 import asp4j.solver.SolverDLV;
+import asp4j.solver.object.FilterBinding;
+import asp4j.solver.object.FilterBindingImpl;
 import asp4j.solver.object.ObjectSolver;
 import asp4j.solver.object.ObjectSolverImpl;
-import asp4j.solver.object.OutputAtomBinding;
 import java.io.File;
-import java.util.List;
 import java.util.Set;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -52,26 +50,20 @@ public class TestPerson {
 
         ObjectSolver objectSolver = new ObjectSolverImpl(new SolverDLV());
 
-        ProgramBuilder<ObjectAtom> builder = new ProgramBuilder();
+        ProgramBuilder builder = new ProgramBuilder();
         builder.add(new File(rulefile)).add(person);
 
-        OutputAtomBinding binding = new OutputAtomBinding();
+        FilterBinding binding = new FilterBindingImpl();
         binding.add(Male.class).add(Female.class);
 
-        AnswerSets<OutputAtom> answerSets = objectSolver.getAnswerSets(builder.build(), binding);
+        AnswerSets<Object> answerSets = objectSolver.getAnswerSets(builder.build(), binding);
 
         assertTrue(answerSets.cautiousConsequence().isEmpty());
-        Set<OutputAtom> braveConsequence = answerSets.braveConsequence();
+        Set<Object> braveConsequence = answerSets.braveConsequence();
         assertEquals(2,braveConsequence.size());
         assertTrue(braveConsequence.contains(male));
         assertTrue(braveConsequence.contains(female));
         
-        List<AnswerSet<OutputAtom>> sets = answerSets.asList();
-//        for (AnswerSet<OutputAtom> set : sets) {
-//            System.out.println(set);
-//        }        
-        //
-//        System.out.println("-");
         binding.add(Person.class);
         answerSets = objectSolver.getAnswerSets(builder.build(), binding);
 
@@ -80,10 +72,5 @@ public class TestPerson {
         assertTrue(braveConsequence.contains(male));
         assertTrue(braveConsequence.contains(female));
         
-//        sets = answerSets.asList();
-//        for (AnswerSet<OutputAtom> set : sets) {
-//            System.out.println(set);
-//        }
-
     }
 }

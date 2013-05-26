@@ -9,14 +9,14 @@ import java.util.Collection;
  * @author hbeck
  * date May 26, 2013
  */
-public interface FilterBinding<Out> {
+public interface FilterBinding {
     
-    FilterBinding<Out> add(Class<? extends Out> clazz) throws Exception;
+    FilterBinding add(Class clazz) throws Exception;
 
-    FilterBinding<Out> remove(Class<? extends Out> clazz) throws Exception;
+    FilterBinding remove(Class clazz) throws Exception;
 
     Collection<String> getFilterPredicateNames();
 
-    Out asObject(Atom atom) throws Exception;
+    Object asObject(Atom atom) throws Exception;
 
 }

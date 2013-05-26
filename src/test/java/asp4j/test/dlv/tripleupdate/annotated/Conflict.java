@@ -1,7 +1,7 @@
 package asp4j.test.dlv.tripleupdate.annotated;
 
 import asp4j.mapping.annotations.Arg;
-import asp4j.mapping.annotations.Atomname;
+import asp4j.mapping.annotations.Predicate;
 import java.util.Objects;
 import org.openrdf.model.Statement;
 import org.openrdf.model.impl.StatementImpl;
@@ -9,9 +9,10 @@ import org.openrdf.model.impl.URIImpl;
 
 /**
  *
- * @author hbeck date May 24, 2013
+ * @author hbeck
+ * date May 24, 2013
  */
-@Atomname("confl")
+@Predicate("confl")
 public class Conflict {
 
     private String type;

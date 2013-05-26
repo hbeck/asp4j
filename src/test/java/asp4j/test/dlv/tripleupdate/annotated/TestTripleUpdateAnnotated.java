@@ -3,7 +3,7 @@ package asp4j.test.dlv.tripleupdate.annotated;
 import asp4j.lang.answerset.AnswerSets;
 import asp4j.program.ProgramBuilder;
 import asp4j.solver.SolverDLV;
-import asp4j.solver.object.ObjectBinding;
+import asp4j.solver.object.FilterBindingImpl;
 import asp4j.solver.object.ObjectSolver;
 import asp4j.solver.object.ObjectSolverImpl;
 import java.io.File;
@@ -17,7 +17,8 @@ import org.openrdf.model.impl.URIImpl;
 
 /**
  *
- * @author hbeck date 2013-05-14
+ * @author hbeck 
+ * date May 14, 2013
  */
 public class TestTripleUpdateAnnotated {
 
@@ -37,7 +38,7 @@ public class TestTripleUpdateAnnotated {
                 .add(new Addition(car_hasColor_blue))
                 .add(new Addition(hasColor_inverseOf_colorOf));
 
-        ObjectBinding binding = new ObjectBinding();
+        FilterBindingImpl binding = new FilterBindingImpl();
         binding.add(Addition.class);
 
         AnswerSets<Object> as = objectSolver.getAnswerSets(builder.build(), binding);
@@ -45,18 +46,7 @@ public class TestTripleUpdateAnnotated {
         assertTrue(CollectionUtils.isEqualCollection(as.braveConsequence(), as.cautiousConsequence()));
         assertEquals(1, as.asList().size());        
         assertTrue(as.asList().get(0).atoms().contains(new Addition(blue_colorOf_car)));
-        
 
-//        for (AnswerSet<OutputAtom> x : oas.asList()) {
-//            for (OutputAtom a : x.atoms()) {
-//                System.out.println(a);
-//            }
-//        }
-//        System.out.println("-");
-//        Set<OutputAtom> filtered = oas.asList().get(0).filter(ASPUtils.classFilter(Addition.class));
-//        for (OutputAtom so : filtered) {
-//            System.out.println(so);
-//        }
     }
 
     @Test
@@ -89,7 +79,7 @@ public class TestTripleUpdateAnnotated {
                 .add(new InDatabase(blue_colorOf_car))
                 .add(new Addition(red_colorOf_car));
 
-        ObjectBinding binding = new ObjectBinding();
+        FilterBindingImpl binding = new FilterBindingImpl();
         binding.add(Conflict.class);
 
         AnswerSets<Object> as = objectSolver.getAnswerSets(builder.build(), binding);

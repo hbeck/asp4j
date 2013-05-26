@@ -1,9 +1,9 @@
-package asp4j.test.dlv.person.wrapped;
+package asp4j.test.dlv.person.direct;
 
 import asp4j.lang.Atom;
 import asp4j.lang.AtomImpl;
-import asp4j.mapping.direct.ObjectAtom;
-import asp4j.mapping.direct.OutputAtom;
+import asp4j.mapping.direct.CanAsAtom;
+import asp4j.mapping.direct.CanInitFromAtom;
 import java.util.Objects;
 
 /**
@@ -11,7 +11,7 @@ import java.util.Objects;
  * @author hbeck
  * date May 20, 2013
  */
-public class Person implements OutputAtom, ObjectAtom {
+public class Person implements CanInitFromAtom, CanAsAtom {
     
     private String id;
     
