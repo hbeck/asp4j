@@ -1,7 +1,7 @@
 package asp4j.solver;
 
-import asp4j.lang.Atom;
 import asp4j.lang.AnswerSet;
+import asp4j.lang.Atom;
 import asp4j.program.Program;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -14,18 +14,27 @@ import java.util.Set;
 
 /**
  *
- * @author hbeck date Apr 14, 2013
+ * @author hbeck 
+ * date Apr 14, 2013
  */
 public abstract class SolverBase implements Solver {
+    
+    protected int lastProgramHashCode;
+    protected List<AnswerSet<Atom>> lastProgramAnswerSets;
 
     public SolverBase() {
         init();
     }
 
     private void init() {
+        lastProgramAnswerSets=null;
+    }
+    
+    protected void clear() {
+        lastProgramAnswerSets=null;
     }
 
-    protected void preSolver(Program<Atom> program) throws Exception {
+    protected void preSolver(Program<Atom> program) throws Exception {        
     }
 
     protected abstract String solverCommand(Program<Atom> program);
@@ -60,11 +69,15 @@ public abstract class SolverBase implements Solver {
 
     @Override
     public List<AnswerSet<Atom>> getAnswerSets(Program<Atom> program) throws Exception {
+        if (lastProgramAnswerSets!=null && program.hashCode()==lastProgramHashCode) {
+            return lastProgramAnswerSets;
+        }
+        lastProgramHashCode=program.hashCode();
         preSolver(program);
         Process exec = Runtime.getRuntime().exec(solverCommand(program));
         List<String> answerSetStrings = getAnswerSetStrings(exec);
-        postSolver(program);
-        return Collections.unmodifiableList(mapAnswerSetStrings(answerSetStrings));
+        postSolver(program);        
+        return lastProgramAnswerSets=Collections.unmodifiableList(mapAnswerSetStrings(answerSetStrings));
 
     }
 
