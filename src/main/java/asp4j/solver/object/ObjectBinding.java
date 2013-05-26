@@ -1,7 +1,7 @@
 package asp4j.solver.object;
 
-import asp4j.annotations.Atomname;
-import asp4j.annotations.ReflectionUtils;
+import asp4j.mapping.annotations.Atomname;
+import asp4j.mapping.annotations.ReflectionUtils;
 import asp4j.lang.Atom;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;

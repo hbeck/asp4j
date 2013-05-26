@@ -2,8 +2,8 @@ package asp4j.test.dlv.person.wrapped;
 
 import asp4j.lang.Atom;
 import asp4j.lang.AtomImpl;
-import asp4j.mapping.ObjectAtom;
-import asp4j.mapping.OutputAtom;
+import asp4j.mapping.direct.ObjectAtom;
+import asp4j.mapping.direct.OutputAtom;
 import java.util.Objects;
 
 /**

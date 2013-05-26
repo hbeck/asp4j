@@ -1,4 +1,4 @@
-package asp4j.annotations;
+package asp4j.mapping.annotations;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

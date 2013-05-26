@@ -1,6 +1,6 @@
 package asp4j.test.dlv.person.annotated;
 
-import asp4j.annotations.Atomname;
+import asp4j.mapping.annotations.Atomname;
 import java.util.Objects;
 
 /**

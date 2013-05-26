@@ -1,7 +1,7 @@
 package asp4j.solver.object;
 
 import asp4j.lang.Atom;
-import asp4j.mapping.OutputAtom;
+import asp4j.mapping.direct.OutputAtom;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import java.util.Collection;

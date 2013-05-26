@@ -2,7 +2,7 @@ package asp4j.test.dlv.tripleupdate.wrapped;
 
 import asp4j.lang.Atom;
 import asp4j.lang.AtomImpl;
-import asp4j.mapping.ObjectAtom;
+import asp4j.mapping.direct.ObjectAtom;
 import java.util.Objects;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;

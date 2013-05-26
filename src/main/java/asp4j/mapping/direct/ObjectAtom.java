@@ -1,4 +1,4 @@
-package asp4j.mapping;
+package asp4j.mapping.direct;
 
 import asp4j.lang.Atom;
 

@@ -1,4 +1,4 @@
-package asp4j.annotations;
+package asp4j.mapping.annotations;
 
 import asp4j.lang.Atom;
 import asp4j.lang.AtomImpl;

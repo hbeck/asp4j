@@ -1,6 +1,6 @@
 package asp4j.test.dlv.tripleupdate.annotated;
 
-import asp4j.annotations.Atomname;
+import asp4j.mapping.annotations.Atomname;
 import java.util.Objects;
 import org.openrdf.model.Statement;
 

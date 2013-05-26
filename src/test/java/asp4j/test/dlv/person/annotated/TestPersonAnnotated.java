@@ -2,8 +2,8 @@ package asp4j.test.dlv.person.annotated;
 
 import asp4j.lang.answerset.AnswerSet;
 import asp4j.lang.answerset.AnswerSets;
-import asp4j.mapping.ObjectAtom;
-import asp4j.mapping.OutputAtom;
+import asp4j.mapping.direct.ObjectAtom;
+import asp4j.mapping.direct.OutputAtom;
 import asp4j.program.ProgramBuilder;
 import asp4j.solver.SolverDLV;
 import asp4j.solver.object.ObjectBinding;

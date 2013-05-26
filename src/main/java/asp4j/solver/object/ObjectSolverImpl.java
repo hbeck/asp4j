@@ -1,13 +1,13 @@
 package asp4j.solver.object;
 
-import asp4j.annotations.ReflectionUtils;
+import asp4j.mapping.annotations.ReflectionUtils;
 import asp4j.lang.Atom;
 import asp4j.lang.answerset.AnswerSet;
 import asp4j.lang.answerset.AnswerSetImpl;
 import asp4j.lang.answerset.AnswerSets;
 import asp4j.lang.answerset.AnswerSetsImpl;
-import asp4j.mapping.ObjectAtom;
-import asp4j.mapping.OutputAtom;
+import asp4j.mapping.direct.ObjectAtom;
+import asp4j.mapping.direct.OutputAtom;
 import asp4j.program.Program;
 import asp4j.program.ProgramBuilder;
 import asp4j.solver.Solver;

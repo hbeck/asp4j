@@ -1,6 +1,6 @@
 package asp4j.test.dlv.tripleupdate.wrapped;
 
-import asp4j.mapping.OutputAtom;
+import asp4j.mapping.direct.OutputAtom;
 import asp4j.test.dlv.person.wrapped.Person;
 import java.util.Objects;
 import org.openrdf.model.Statement;

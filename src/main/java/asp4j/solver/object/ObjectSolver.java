@@ -1,8 +1,8 @@
 package asp4j.solver.object;
 
 import asp4j.lang.answerset.AnswerSets;
-import asp4j.mapping.ObjectAtom;
-import asp4j.mapping.OutputAtom;
+import asp4j.mapping.direct.ObjectAtom;
+import asp4j.mapping.direct.OutputAtom;
 import asp4j.program.Program;
 
 /**
