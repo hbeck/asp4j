@@ -3,6 +3,7 @@ package asp4j.test.dlv.person.annotated;
 import asp4j.lang.answerset.AnswerSets;
 import asp4j.program.ProgramBuilder;
 import asp4j.solver.SolverDLV;
+import asp4j.solver.object.FilterBinding;
 import asp4j.solver.object.FilterBindingImpl;
 import asp4j.solver.object.ObjectSolver;
 import asp4j.solver.object.ObjectSolverImpl;
@@ -51,11 +52,12 @@ public class TestPersonAnnotated {
         ProgramBuilder<Object> builder = new ProgramBuilder();
         builder.add(new File(rulefile)).add(person);
 
-        FilterBindingImpl binding = new FilterBindingImpl();
+        FilterBinding binding = new FilterBindingImpl();
         binding.add(Male.class).add(Female.class);
 
         AnswerSets<Object> answerSets = objectSolver.getAnswerSets(builder.build(), binding);
 
+        assertEquals(2,answerSets.asList().size());
         assertTrue(answerSets.cautiousConsequence().isEmpty());
         Set<Object> braveConsequence = answerSets.braveConsequence();
         assertEquals(2, braveConsequence.size());
@@ -65,8 +67,10 @@ public class TestPersonAnnotated {
         //
         binding.add(Person.class);
         answerSets = objectSolver.getAnswerSets(builder.build(), binding);
-
-        assertTrue(answerSets.cautiousConsequence().contains(person));
+        
+        Set<Object> cautiousConsequence = answerSets.cautiousConsequence();
+        assertEquals(1,cautiousConsequence.size());
+        assertTrue(cautiousConsequence.contains(person));
         braveConsequence = answerSets.braveConsequence();
         assertTrue(braveConsequence.contains(male));
         assertTrue(braveConsequence.contains(female));

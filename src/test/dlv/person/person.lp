@@ -1,1 +1,1 @@
-male(X) v female(X) :- person(X).
+female(X) v male(X) :- person(X).
