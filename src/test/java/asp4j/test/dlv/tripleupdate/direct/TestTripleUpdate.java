@@ -4,7 +4,6 @@ import asp4j.lang.Atom;
 import asp4j.lang.AtomImpl;
 import asp4j.lang.answerset.AnswerSets;
 import asp4j.mapping.direct.CanAsAtom;
-import asp4j.mapping.direct.CanInitFromAtom;
 import asp4j.program.ProgramBuilder;
 import asp4j.solver.Solver;
 import asp4j.solver.SolverDLV;
