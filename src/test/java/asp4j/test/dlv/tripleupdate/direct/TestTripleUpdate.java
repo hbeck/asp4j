@@ -10,7 +10,7 @@ import asp4j.solver.ReasoningMode;
 import asp4j.solver.Solver;
 import asp4j.solver.SolverDLV;
 import asp4j.solver.object.FilterBinding;
-import asp4j.solver.object.FilterBindingImpl;
+import asp4j.solver.object.FilterBinding;
 import asp4j.solver.object.ObjectSolver;
 import asp4j.solver.object.ObjectSolverImpl;
 import java.io.File;
@@ -83,7 +83,7 @@ public class TestTripleUpdate {
                 .add(new Addition(car_hasColor_blue))
                 .add(new Addition(hasColor_inverseOf_colorOf));
 
-        FilterBinding binding = new FilterBindingImpl();
+        FilterBinding binding = new FilterBinding();
         binding.add(Addition.class);
 
         Program<Object> program = builder.build();
@@ -128,7 +128,7 @@ public class TestTripleUpdate {
                 .add(new InDatabase(blue_colorOf_car))
                 .add(new Addition(red_colorOf_car));
 
-        FilterBinding binding = new FilterBindingImpl();
+        FilterBinding binding = new FilterBinding();
         binding.add(Conflict.class);
         
         Program<CanAsAtom> program = builder.build();

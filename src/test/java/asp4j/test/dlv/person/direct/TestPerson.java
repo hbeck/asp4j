@@ -5,7 +5,7 @@ import asp4j.program.ProgramBuilder;
 import asp4j.solver.ReasoningMode;
 import asp4j.solver.SolverDLV;
 import asp4j.solver.object.FilterBinding;
-import asp4j.solver.object.FilterBindingImpl;
+import asp4j.solver.object.FilterBinding;
 import asp4j.solver.object.ObjectSolver;
 import asp4j.solver.object.ObjectSolverImpl;
 import java.io.File;
@@ -53,7 +53,7 @@ public class TestPerson {
         ProgramBuilder builder = new ProgramBuilder();
         builder.add(new File(rulefile)).add(person);
 
-        FilterBinding binding = new FilterBindingImpl();
+        FilterBinding binding = new FilterBinding();
         binding.add(Male.class).add(Female.class);
 
         Program<Object> program = builder.build();

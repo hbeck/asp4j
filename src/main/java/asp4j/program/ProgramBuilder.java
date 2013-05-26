@@ -2,6 +2,7 @@ package asp4j.program;
 
 import java.io.File;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -21,7 +22,18 @@ public class ProgramBuilder<T> {
     }
 
     public Program<T> build() {
-        return new ProgramImpl(input, files);
+        return new Program<T>(){
+            private final Collection<T> programInput = Collections.unmodifiableCollection(input);
+            private final Collection<File> programFiles = Collections.unmodifiableCollection(files);
+            @Override
+            public Collection<T> getInput() {
+                return programInput;
+            }
+            @Override
+            public Collection<File> getFiles() {
+                return programFiles;
+            }
+        };
     }
 
     public ProgramBuilder<T> add(T t) {

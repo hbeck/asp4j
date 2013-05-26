@@ -45,27 +45,27 @@ public class Male extends Person {
 ```java
 Person person = new Person("id42");
 
-ObjectSolver objectSolver = new ObjectSolverImpl(new SolverDLV());
-       
+ObjectSolver solver = new ObjectSolverImpl(new SolverDLV());
+
+//"person.lp"
 Program<Object> program = new ProgramBuilder().add(new File(rulefile)).add(person).build();
-FilterBinding binding = new FilterBindingImpl().add(Male.class).add(Female.class);
+FilterBinding binding = new FilterBinding().add(Male.class).add(Female.class);
+List<AnswerSet<Object>> answerSets = solver.getAnswerSets(program, binding);
 
-List<AnswerSet<Object>> answerSets = objectSolver.getAnswerSets(program, binding);
+// ==> answerSets.size() == 2
 
-// ==> answerSets.asList().size() == 2  
-
-Set<Object> cautiousCons = objectSolver.getConsequence(program, binding, ReasoningMode.CAUTIOUS);
+Set<Object> cautiousConsequence = solver.getConsequence(program, binding, ReasoningMode.CAUTIOUS);
 
 // ==> cautiousConsequence.isEmpty()
 
-Set<Object> braveConsequence = objectSolver.getConsequence(program, binding, ReasoningMode.BRAVE);
+Set<Object> braveConsequence = solver.getConsequence(program, binding, ReasoningMode.BRAVE);
 
 // ==> braveConsequence.size() == 2
-// ==> braveConsequence.contains(new Female("id42"));    
-// ==> braveConsequence.contains(new Male("id42"));  
-  
+// ==> braveConsequence.contains(new Female("id42"))
+// ==> braveConsequence.contains(new Male("id42"))
+
 binding.add(Person.class);
-cautiousConsequence = objectSolver.getConsequence(program, binding, ReasoningMode.CAUTIOUS);
+cautiousConsequence = solver.getConsequence(program, binding, ReasoningMode.CAUTIOUS);
 
 // ==> cautiousConsequence.size() == 1
 // ==> cautiousConsequence.contains(person)

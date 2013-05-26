@@ -14,7 +14,4 @@ public interface Program<T> {
 
     Collection<File> getFiles();
 
-    void setFiles(Collection<File> files);
-
-    void setInput(Collection<T> input);
 }
