@@ -14,8 +14,5 @@ public interface AnswerSet<T> {
     
     Set<T> filter(Predicate<T> predicate);
     
-//    <T extends SolverOutput> Collection<T> filter(Class<T> clazz) throws Exception;
-//    Collection<SolverOutput> filter(Class<? extends SolverOutput> ... clazzes) throws Exception;
-//    Collection<SolverOutput> filter(Collection<Class<? extends SolverOutput>> clazzes) throws Exception;
 
 }

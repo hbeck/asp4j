@@ -16,10 +16,6 @@ public class AtomImpl implements Atom {
         this.args = args;
     }
 
-//    public AtomImpl(String predicateName, String[] args) {
-//        this.predicateName = predicateName;
-//        this.args = args;
-//    }
     public static Atom parse(String atomString) {
         String s = atomString.trim();
         if (s.endsWith(".")) {
@@ -31,7 +27,7 @@ public class AtomImpl implements Atom {
         String[] args = inner.split(",");
         for (String arg : args) {
             if (arg.contains("(")) {
-                throw new UnsupportedOperationException("cannot parse function symbols");
+                throw new UnsupportedOperationException("function symbols not supported");
             }
         }
         return new AtomImpl(predicateName, args);

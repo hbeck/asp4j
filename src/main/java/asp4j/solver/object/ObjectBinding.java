@@ -1,20 +1,16 @@
 package asp4j.solver.object;
 
-import asp4j.annotations.ReflectionUtils;
-import asp4j.annotations.Arg;
 import asp4j.annotations.Atomname;
+import asp4j.annotations.ReflectionUtils;
 import asp4j.lang.Atom;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
 import java.util.Collection;
 
 /**
  *
- * @author hbeck date May 23, 2013
+ * @author hbeck
+ * date May 23, 2013
  */
 public class ObjectBinding {
 

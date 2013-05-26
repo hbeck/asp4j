@@ -1,5 +1,6 @@
 package asp4j.lang.answerset;
 
+import com.google.common.collect.ImmutableList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -8,14 +9,15 @@ import java.util.Set;
 
 /**
  *
- * @author hbeck date 2013-05-19
+ * @author hbeck
+ * date 2013-05-19
  */
 public class AnswerSetsImpl<T> implements AnswerSets<T> {
 
-    private final List<AnswerSet<T>> answerSets; //todo immutable
+    private final List<AnswerSet<T>> answerSets;
 
     public AnswerSetsImpl(List<AnswerSet<T>> answerSets) {
-        this.answerSets = answerSets;
+        this.answerSets=ImmutableList.<AnswerSet<T>>builder().addAll(answerSets).build();
     }
 
     @Override

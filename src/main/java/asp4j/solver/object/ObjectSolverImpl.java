@@ -12,14 +12,15 @@ import asp4j.program.Program;
 import asp4j.program.ProgramBuilder;
 import asp4j.solver.Solver;
 import com.google.common.base.Predicate;
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
 /**
  *
- * @author hbeck date May 20, 2013
+ * @author hbeck
+ * date May 20, 2013
  */
 public class ObjectSolverImpl implements ObjectSolver {
 
@@ -44,10 +45,10 @@ public class ObjectSolverImpl implements ObjectSolver {
                 return predicateNames.contains(atom.predicateName());
             }
         };
-        List<AnswerSet<OutputAtom>> list = new LinkedList();
+        List<AnswerSet<OutputAtom>> list = new ArrayList();
         for (AnswerSet<Atom> answerSet : answerSets) {
             Set<Atom> filtered = answerSet.filter(isOutputAtom);
-            Collection<OutputAtom> as = new LinkedList();
+            Collection<OutputAtom> as = new ArrayList();
             for (Atom atom : filtered) {
                 as.add(binding.asObject(atom));
             }
@@ -71,10 +72,10 @@ public class ObjectSolverImpl implements ObjectSolver {
                 return predicateNames.contains(atom.predicateName());
             }
         };
-        List<AnswerSet<Object>> list = new LinkedList();
+        List<AnswerSet<Object>> list = new ArrayList();
         for (AnswerSet<Atom> answerSet : answerSets) {
             Set<Atom> filtered = answerSet.filter(isOutputAtom);
-            Collection<Object> as = new LinkedList();
+            Collection<Object> as = new ArrayList();
             for (Atom atom : filtered) {
                 as.add(binding.asObject(atom));
             }

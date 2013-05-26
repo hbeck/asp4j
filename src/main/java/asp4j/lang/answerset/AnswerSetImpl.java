@@ -8,7 +8,8 @@ import java.util.Collection;
 import java.util.Set;
 
 /**
- * @author hbeck date Apr 14, 2013
+ * @author hbeck 
+ * date Apr 14, 2013
  */
 public class AnswerSetImpl<T> implements AnswerSet<T> {
 
@@ -47,8 +48,6 @@ public class AnswerSetImpl<T> implements AnswerSet<T> {
         }
         sb.append('}');
         return sb.toString();
-    }
-    
-    
+    }    
     
 }

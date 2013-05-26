@@ -5,18 +5,20 @@ import asp4j.lang.AtomImpl;
 import asp4j.lang.answerset.AnswerSet;
 import asp4j.lang.answerset.AnswerSetImpl;
 import asp4j.program.Program;
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedList;
 import java.util.List;
+import org.apache.commons.io.IOUtils;
 
 /**
  *
- * @author hbeck date April 14, 2013
+ * @author hbeck
+ * date April 14, 2013
  */
 public class SolverDLV extends SolverBase {
 
@@ -32,34 +34,26 @@ public class SolverDLV extends SolverBase {
         if (!program.getInput().isEmpty()) {
             sb.append(" ").append(temporaryInputFile);
         }
-        //System.out.println(sb.toString());
         return sb.toString();
     }
-
+    
     @Override
-    protected List<String> parseAnswerSetStrings(BufferedReader input) throws IOException {
-        //use apache commons
-        List<String> strings = new LinkedList();
-        String line;
-        while ((line = input.readLine()) != null) {
-            if (line.isEmpty()) {
-                continue;
-            }
-            strings.add(line.substring(1, line.length() - 1));
-        }
-        return strings;
+    protected List<String> getAnswerSetStrings(Process exec) throws IOException {
+        InputStream inputStream = exec.getInputStream();
+        return IOUtils.readLines(inputStream);
     }
 
+    
     @Override
-    protected List<AnswerSet<Atom>> mapAnswerSetStrings(List<String> strings) {
-        //TODO make List<AnswerSet> final, no add methods. use builder pattern
-        List<AnswerSet<Atom>> answerSets = new LinkedList();
+    protected List<AnswerSet<Atom>> mapAnswerSetStrings(List<String> strings) {        
+        List<AnswerSet<Atom>> answerSets = new ArrayList();
         for (String answerSetString : strings) {
-            //System.out.println("answer set string: "+answerSetString);
+            if (answerSetString.startsWith("{")) {
+                answerSetString=answerSetString.substring(1,answerSetString.length()-1);
+            }
             String[] atomStrings = answerSetString.split(", ");
-            Collection<Atom> atoms = new LinkedList();
+            Collection<Atom> atoms = new ArrayList();
             for (String atomString : atomStrings) {
-                //System.out.println("atom: "+atomString);
                 int idxParen = atomString.indexOf("(");
                 String predicateName = atomString.substring(0, idxParen);
                 String[] args = atomString.substring(idxParen + 1, atomString.length() - 1).split(",");

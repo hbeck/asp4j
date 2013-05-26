@@ -8,7 +8,8 @@ import java.util.Collection;
 
 /**
  *
- * @author hbeck date May 19, 2013
+ * @author hbeck
+ * date May 19, 2013
  */
 public class OutputAtomBinding {
 
