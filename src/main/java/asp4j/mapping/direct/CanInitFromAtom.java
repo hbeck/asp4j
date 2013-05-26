@@ -6,9 +6,9 @@ import asp4j.lang.HasPredicateName;
 /**
  *
  * @author hbeck
- * date 2013-05-14
+ * date May 14, 2013
  */
-public interface OutputAtom extends HasPredicateName {
+public interface CanInitFromAtom extends HasPredicateName {
     
     void init(Atom atom);
     

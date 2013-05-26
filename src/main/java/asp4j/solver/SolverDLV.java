@@ -42,7 +42,6 @@ public class SolverDLV extends SolverBase {
         InputStream inputStream = exec.getInputStream();
         return IOUtils.readLines(inputStream);
     }
-
     
     @Override
     protected List<AnswerSet<Atom>> mapAnswerSetStrings(List<String> strings) {        

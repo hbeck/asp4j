@@ -1,26 +1,21 @@
 package asp4j.solver.object;
 
-import asp4j.mapping.annotations.ReflectionUtils;
 import asp4j.lang.Atom;
 import asp4j.lang.answerset.AnswerSet;
 import asp4j.lang.answerset.AnswerSetImpl;
 import asp4j.lang.answerset.AnswerSets;
 import asp4j.lang.answerset.AnswerSetsImpl;
-import asp4j.mapping.direct.ObjectAtom;
-import asp4j.mapping.direct.OutputAtom;
+import asp4j.mapping.MappingUtils;
 import asp4j.program.Program;
 import asp4j.program.ProgramBuilder;
 import asp4j.solver.Solver;
-import com.google.common.base.Predicate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 /**
  *
- * @author hbeck
- * date May 20, 2013
+ * @author hbeck date May 20, 2013
  */
 public class ObjectSolverImpl implements ObjectSolver {
 
@@ -31,56 +26,29 @@ public class ObjectSolverImpl implements ObjectSolver {
     }
 
     @Override
-    public AnswerSets<OutputAtom> getAnswerSets(Program<ObjectAtom> program, OutputAtomBinding binding) throws Exception {
-        ProgramBuilder<Atom> builder = new ProgramBuilder();
-        builder.addFiles(program.getFiles());
-        for (ObjectAtom objectAtom : program.getInput()) {
-            builder.add(objectAtom.asAtom());
-        }
-        List<AnswerSet<Atom>> answerSets = solver.getAnswerSets(builder.build()).asList();
-        final Collection<String> predicateNames = binding.getBoundPredicateNames();
-        Predicate<Atom> isOutputAtom = new Predicate<Atom>() {
-            @Override
-            public boolean apply(Atom atom) {
-                return predicateNames.contains(atom.predicateName());
-            }
-        };
-        List<AnswerSet<OutputAtom>> list = new ArrayList();
+    public <In, Out> AnswerSets<Out> getAnswerSets(Program<In> program, FilterBinding<Out> binding) throws Exception {
+        List<AnswerSet<Atom>> answerSets = lowLevelAnswerSets(program);
+        Collection<String> predicateNames = binding.getFilterPredicateNames();
+        List<AnswerSet<Out>> list = new ArrayList();
         for (AnswerSet<Atom> answerSet : answerSets) {
-            Set<Atom> filtered = answerSet.filter(isOutputAtom);
-            Collection<OutputAtom> as = new ArrayList();
-            for (Atom atom : filtered) {
-                as.add(binding.asObject(atom));
+            Collection<Out> as = new ArrayList();
+            for (Atom atom : answerSet.atoms()) {
+                if (predicateNames.contains(atom.predicateName())) {
+                    as.add(binding.asObject(atom));
+                }
             }
             list.add(new AnswerSetImpl(as));
         }
         return new AnswerSetsImpl(list);
     }
-    
-    @Override
-    public AnswerSets<Object> getAnswerSets(Program<Object> program, ObjectBinding binding) throws Exception {
+
+    private <In> List<AnswerSet<Atom>> lowLevelAnswerSets(Program<In> program) throws Exception {
         ProgramBuilder<Atom> builder = new ProgramBuilder();
         builder.addFiles(program.getFiles());
-        for (Object object : program.getInput()) {
-            builder.add(ReflectionUtils.asAtom(object));
+        for (In input : program.getInput()) {
+            builder.add(MappingUtils.asAtom(input));
         }
-        List<AnswerSet<Atom>> answerSets = solver.getAnswerSets(builder.build()).asList();
-        final Collection<String> predicateNames = binding.getBoundPredicateNames();
-        Predicate<Atom> isOutputAtom = new Predicate<Atom>() {
-            @Override
-            public boolean apply(Atom atom) {
-                return predicateNames.contains(atom.predicateName());
-            }
-        };
-        List<AnswerSet<Object>> list = new ArrayList();
-        for (AnswerSet<Atom> answerSet : answerSets) {
-            Set<Atom> filtered = answerSet.filter(isOutputAtom);
-            Collection<Object> as = new ArrayList();
-            for (Atom atom : filtered) {
-                as.add(binding.asObject(atom));
-            }
-            list.add(new AnswerSetImpl(as));
-        }
-        return new AnswerSetsImpl(list);
+        return solver.getAnswerSets(builder.build()).asList();
+
     }
 }

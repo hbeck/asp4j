@@ -5,8 +5,9 @@ import asp4j.lang.Atom;
 /**
  *
  * @author hbeck
+ * date May 14, 2013
  */
-public interface ObjectAtom {
+public interface CanAsAtom {
     
     Atom asAtom();
     

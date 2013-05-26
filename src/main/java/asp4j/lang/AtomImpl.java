@@ -4,7 +4,8 @@ import java.util.Objects;
 
 /**
  *
- * @author hbeck date May 14, 2013
+ * @author hbeck
+ * date May 14, 2013
  */
 public class AtomImpl implements Atom {
 

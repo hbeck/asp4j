@@ -5,7 +5,6 @@ import asp4j.lang.answerset.AnswerSet;
 import asp4j.lang.answerset.AnswerSets;
 import asp4j.lang.answerset.AnswerSetsImpl;
 import asp4j.program.Program;
-import com.google.common.collect.ImmutableList;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;

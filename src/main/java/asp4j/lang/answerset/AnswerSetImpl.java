@@ -1,8 +1,6 @@
 package asp4j.lang.answerset;
 
-import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.ImmutableSet.Builder;
 import com.google.common.collect.UnmodifiableIterator;
 import java.util.Collection;
 import java.util.Set;
@@ -22,17 +20,6 @@ public class AnswerSetImpl<T> implements AnswerSet<T> {
     @Override
     public Set<T> atoms() {
         return atoms;
-    }
-
-    @Override
-    public Set<T> filter(Predicate<T> predicate) {
-        Builder<T> builder = ImmutableSet.<T>builder();
-        for (T atom : atoms) {
-            if (predicate.apply(atom)) {
-                builder.add(atom);
-            }
-        }
-        return builder.build();
     }
 
     @Override
