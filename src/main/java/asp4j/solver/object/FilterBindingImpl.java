@@ -4,20 +4,20 @@ import asp4j.lang.Atom;
 import asp4j.lang.HasPredicateName;
 import asp4j.mapping.MappingUtils;
 import asp4j.mapping.annotations.Predicate;
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
 import java.lang.annotation.Annotation;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author hbeck date May 23, 2013
  */
 public class FilterBindingImpl implements FilterBinding {
 
-    BiMap<String, Class> predicate2class;
+    Map<String, Class> predicate2class;
 
     public FilterBindingImpl() {
-        this.predicate2class = HashBiMap.create();
+        this.predicate2class = new HashMap();
     }
 
     @Override

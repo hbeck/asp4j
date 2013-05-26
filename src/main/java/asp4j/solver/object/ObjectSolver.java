@@ -1,7 +1,10 @@
 package asp4j.solver.object;
 
-import asp4j.lang.answerset.AnswerSets;
+import asp4j.lang.AnswerSet;
 import asp4j.program.Program;
+import asp4j.solver.ReasoningMode;
+import java.util.List;
+import java.util.Set;
 
 /**
  * 
@@ -10,6 +13,8 @@ import asp4j.program.Program;
  */
 public interface ObjectSolver {
     
-    <T> AnswerSets<Object> getAnswerSets(Program<T> program, FilterBinding binding) throws Exception;
+    List<AnswerSet<Object>> getAnswerSets(Program<?> program, FilterBinding binding) throws Exception;
+    
+    Set<Object> getConsequence(Program<?> program, FilterBinding binding, ReasoningMode mode) throws Exception;
 
 }

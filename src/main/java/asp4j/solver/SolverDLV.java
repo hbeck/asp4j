@@ -1,9 +1,9 @@
 package asp4j.solver;
 
+import asp4j.lang.AnswerSet;
+import asp4j.lang.AnswerSetImpl;
 import asp4j.lang.Atom;
 import asp4j.lang.AtomImpl;
-import asp4j.lang.answerset.AnswerSet;
-import asp4j.lang.answerset.AnswerSetImpl;
 import asp4j.program.Program;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -12,7 +12,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import org.apache.commons.io.IOUtils;
 
 /**
@@ -51,7 +53,7 @@ public class SolverDLV extends SolverBase {
                 answerSetString=answerSetString.substring(1,answerSetString.length()-1);
             }
             String[] atomStrings = answerSetString.split(", ");
-            Collection<Atom> atoms = new ArrayList();
+            Set<Atom> atoms = new HashSet();
             for (String atomString : atomStrings) {
                 int idxParen = atomString.indexOf("(");
                 String predicateName = atomString.substring(0, idxParen);
@@ -87,4 +89,5 @@ public class SolverDLV extends SolverBase {
         sb.append("rm ").append(temporaryInputFile);
         runVoidExec(sb.toString());
     }
+
 }

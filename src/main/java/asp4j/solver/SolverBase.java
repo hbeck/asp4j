@@ -1,19 +1,20 @@
 package asp4j.solver;
 
 import asp4j.lang.Atom;
-import asp4j.lang.answerset.AnswerSet;
-import asp4j.lang.answerset.AnswerSets;
-import asp4j.lang.answerset.AnswerSetsImpl;
+import asp4j.lang.AnswerSet;
 import asp4j.program.Program;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 /**
  *
- * @author hbeck
- * date Apr 14, 2013
+ * @author hbeck date Apr 14, 2013
  */
 public abstract class SolverBase implements Solver {
 
@@ -23,7 +24,7 @@ public abstract class SolverBase implements Solver {
 
     private void init() {
     }
-    
+
     protected void preSolver(Program<Atom> program) throws Exception {
     }
 
@@ -33,7 +34,8 @@ public abstract class SolverBase implements Solver {
     }
 
     /**
-     * @return list of strings, each representing an answer set. atoms comma-separated. {optionally, surrounded, by, braces}
+     * @return list of strings, each representing an answer set. atoms
+     * comma-separated. {optionally, surrounded, by, braces}
      */
     protected abstract List<String> getAnswerSetStrings(Process exec) throws IOException;
 
@@ -57,12 +59,45 @@ public abstract class SolverBase implements Solver {
     }
 
     @Override
-    public AnswerSets<Atom> getAnswerSets(Program<Atom> program) throws Exception {
+    public List<AnswerSet<Atom>> getAnswerSets(Program<Atom> program) throws Exception {
         preSolver(program);
         Process exec = Runtime.getRuntime().exec(solverCommand(program));
         List<String> answerSetStrings = getAnswerSetStrings(exec);
         postSolver(program);
-        return new AnswerSetsImpl(mapAnswerSetStrings(answerSetStrings));
+        return Collections.unmodifiableList(mapAnswerSetStrings(answerSetStrings));
+
     }
 
+    @Override
+    public Set<Atom> getConsequence(Program<Atom> program, ReasoningMode mode) throws Exception {
+        List<AnswerSet<Atom>> as = getAnswerSets(program);
+        switch (mode) {
+            case BRAVE:
+                return braveConsequence(as);
+            case CAUTIOUS:
+                return cautiousConsequence(as);
+            default:
+                return null;
+        }
+    }
+
+    protected Set<Atom> cautiousConsequence(List<AnswerSet<Atom>> answerSets) {
+        Iterator<AnswerSet<Atom>> it = answerSets.iterator();
+        Set<Atom> intersection = new HashSet();
+        if (it.hasNext()) {
+            intersection.addAll(it.next().atoms());
+            while (it.hasNext()) {
+                intersection.retainAll(it.next().atoms());
+            }
+        }
+        return Collections.unmodifiableSet(intersection);
+    }
+
+    protected Set<Atom> braveConsequence(List<AnswerSet<Atom>> answerSets) {
+        Set<Atom> set = new HashSet();
+        for (AnswerSet<Atom> answerSet : answerSets) {
+            set.addAll(answerSet.atoms());
+        }
+        return Collections.unmodifiableSet(set);
+    }
 }

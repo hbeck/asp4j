@@ -1,8 +1,10 @@
 package asp4j.solver;
 
+import asp4j.lang.AnswerSet;
 import asp4j.lang.Atom;
-import asp4j.lang.answerset.AnswerSets;
 import asp4j.program.Program;
+import java.util.List;
+import java.util.Set;
 
 /**
  *
@@ -11,6 +13,8 @@ import asp4j.program.Program;
  */
 public interface Solver {
     
-    AnswerSets<Atom> getAnswerSets(Program<Atom> program) throws Exception;
+    List<AnswerSet<Atom>> getAnswerSets(Program<Atom> program) throws Exception;
+    
+    Set<Atom> getConsequence(Program<Atom> program, ReasoningMode mode) throws Exception;
     
 }

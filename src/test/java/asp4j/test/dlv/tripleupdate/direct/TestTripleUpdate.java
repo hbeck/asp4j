@@ -1,10 +1,12 @@
 package asp4j.test.dlv.tripleupdate.direct;
 
+import asp4j.lang.AnswerSet;
 import asp4j.lang.Atom;
 import asp4j.lang.AtomImpl;
-import asp4j.lang.answerset.AnswerSets;
 import asp4j.mapping.direct.CanAsAtom;
+import asp4j.program.Program;
 import asp4j.program.ProgramBuilder;
+import asp4j.solver.ReasoningMode;
 import asp4j.solver.Solver;
 import asp4j.solver.SolverDLV;
 import asp4j.solver.object.FilterBinding;
@@ -12,6 +14,7 @@ import asp4j.solver.object.FilterBindingImpl;
 import asp4j.solver.object.ObjectSolver;
 import asp4j.solver.object.ObjectSolverImpl;
 import java.io.File;
+import java.util.List;
 import java.util.Set;
 import org.apache.commons.collections.CollectionUtils;
 import static org.junit.Assert.assertEquals;
@@ -23,8 +26,7 @@ import org.openrdf.model.impl.URIImpl;
 
 /**
  *
- * @author hbeck 
- * date 2013-05-14
+ * @author hbeck date 2013-05-14
  */
 public class TestTripleUpdate {
 
@@ -50,17 +52,20 @@ public class TestTripleUpdate {
 
 
         Solver solver = new SolverDLV();
-        ProgramBuilder pbuilder = new ProgramBuilder();
-        pbuilder.add(new File(rulefile))
+        ProgramBuilder<Atom> builder = new ProgramBuilder();
+        builder.add(new File(rulefile))
                 .add(AtomImpl.parse("add(car,hasColor,blue)"))
                 .add(AtomImpl.parse("add(hasColor,inverseOf,colorOf)"));
 
-        AnswerSets<Atom> as = solver.getAnswerSets(pbuilder.build());
+        Program<Atom> program = builder.build();
 
-        assertTrue(CollectionUtils.isEqualCollection(as.braveConsequence(), as.cautiousConsequence()));
-        Set<Atom> cons = as.cautiousConsequence();
-        assertTrue(cons.contains(AtomImpl.parse("add(blue,colorOf,car)")));
-        assertEquals(1, as.asList().size());
+        Set<Atom> cautiousConsequence = solver.getConsequence(program, ReasoningMode.CAUTIOUS);
+        Set<Atom> braveConsequence = solver.getConsequence(program, ReasoningMode.BRAVE);
+        assertTrue(CollectionUtils.isEqualCollection(cautiousConsequence, braveConsequence));
+
+        assertTrue(cautiousConsequence.contains(AtomImpl.parse("add(blue,colorOf,car)")));
+        List<AnswerSet<Atom>> as = solver.getAnswerSets(builder.build());
+        assertEquals(1, as.size());
 
     }
 
@@ -73,7 +78,7 @@ public class TestTripleUpdate {
 
         ObjectSolver objectSolver = new ObjectSolverImpl(new SolverDLV());
 
-        ProgramBuilder<CanAsAtom> builder = new ProgramBuilder();
+        ProgramBuilder<Object> builder = new ProgramBuilder();
         builder.add(new File(rulefile))
                 .add(new Addition(car_hasColor_blue))
                 .add(new Addition(hasColor_inverseOf_colorOf));
@@ -81,11 +86,15 @@ public class TestTripleUpdate {
         FilterBinding binding = new FilterBindingImpl();
         binding.add(Addition.class);
 
-        AnswerSets<Object> as = objectSolver.getAnswerSets(builder.build(), binding);
+        Program<Object> program = builder.build();
 
-        assertTrue(CollectionUtils.isEqualCollection(as.braveConsequence(), as.cautiousConsequence()));
-        assertTrue(as.asList().get(0).atoms().contains(new Addition(blue_colorOf_car)));
-        assertEquals(1, as.asList().size());
+        Set<Object> cautiousConsequence = objectSolver.getConsequence(program, binding, ReasoningMode.CAUTIOUS);
+        Set<Object> braveConsequence = objectSolver.getConsequence(program, binding, ReasoningMode.BRAVE);
+        assertTrue(CollectionUtils.isEqualCollection(cautiousConsequence, braveConsequence));
+
+        List<AnswerSet<Object>> as = objectSolver.getAnswerSets(builder.build(), binding);
+        assertEquals(1, as.size());
+        assertTrue(as.get(0).atoms().contains(new Addition(blue_colorOf_car)));
 
     }
 
@@ -118,21 +127,25 @@ public class TestTripleUpdate {
                 .add(new InDatabase(car_hasColor_blue))
                 .add(new InDatabase(blue_colorOf_car))
                 .add(new Addition(red_colorOf_car));
-        
+
         FilterBinding binding = new FilterBindingImpl();
         binding.add(Conflict.class);
+        
+        Program<CanAsAtom> program = builder.build();
 
-        AnswerSets<Object> as = objectSolver.getAnswerSets(builder.build(), binding);
+        Set<Object> cautiousConsequence = objectSolver.getConsequence(program, binding, ReasoningMode.CAUTIOUS);
+        Set<Object> braveConsequence = objectSolver.getConsequence(program, binding, ReasoningMode.BRAVE);
+        assertTrue(CollectionUtils.isEqualCollection(cautiousConsequence, braveConsequence));
 
-        assertTrue(CollectionUtils.isEqualCollection(as.braveConsequence(), as.cautiousConsequence()));
         Conflict expected = new Conflict();
         //confl(single_violation(car,hasColor,blue,red))
         expected.setType("single_violation");
         expected.setStatement1(car_hasColor_blue);
         expected.setStatement2(car_hasColor_red);
-        assertTrue(as.asList().get(0).atoms().contains(expected));
-        assertEquals(1, as.asList().size());
-        assertEquals(1, as.asList().get(0).atoms().size());
+        List<AnswerSet<Object>> as = objectSolver.getAnswerSets(builder.build(), binding);
+        assertTrue(as.get(0).atoms().contains(expected));
+        assertEquals(1, as.size());
+        assertEquals(1, as.get(0).atoms().size());
     }
 
     private static Statement statement(String subject, String predicate, String object) {

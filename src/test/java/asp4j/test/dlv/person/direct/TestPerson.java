@@ -1,8 +1,8 @@
 package asp4j.test.dlv.person.direct;
 
-import asp4j.lang.answerset.AnswerSets;
-import asp4j.mapping.direct.CanAsAtom;
+import asp4j.program.Program;
 import asp4j.program.ProgramBuilder;
+import asp4j.solver.ReasoningMode;
 import asp4j.solver.SolverDLV;
 import asp4j.solver.object.FilterBinding;
 import asp4j.solver.object.FilterBindingImpl;
@@ -56,19 +56,20 @@ public class TestPerson {
         FilterBinding binding = new FilterBindingImpl();
         binding.add(Male.class).add(Female.class);
 
-        AnswerSets<Object> answerSets = objectSolver.getAnswerSets(builder.build(), binding);
-
-        assertTrue(answerSets.cautiousConsequence().isEmpty());
-        Set<Object> braveConsequence = answerSets.braveConsequence();
+        Program<Object> program = builder.build();
+        
+        Set<Object> cautiousConsequence = objectSolver.getConsequence(program, binding, ReasoningMode.CAUTIOUS);
+        assertTrue(cautiousConsequence.isEmpty());
+        Set<Object> braveConsequence = objectSolver.getConsequence(program, binding, ReasoningMode.BRAVE);
         assertEquals(2,braveConsequence.size());
         assertTrue(braveConsequence.contains(male));
         assertTrue(braveConsequence.contains(female));
         
         binding.add(Person.class);
-        answerSets = objectSolver.getAnswerSets(builder.build(), binding);
 
-        assertTrue(answerSets.cautiousConsequence().contains(person));
-        braveConsequence = answerSets.braveConsequence();
+        cautiousConsequence = objectSolver.getConsequence(program, binding, ReasoningMode.CAUTIOUS);
+        assertTrue(cautiousConsequence.contains(person));
+        braveConsequence = objectSolver.getConsequence(program, binding, ReasoningMode.BRAVE);
         assertTrue(braveConsequence.contains(male));
         assertTrue(braveConsequence.contains(female));
         

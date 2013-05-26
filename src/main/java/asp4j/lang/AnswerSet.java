@@ -1,4 +1,4 @@
-package asp4j.lang.answerset;
+package asp4j.lang;
 
 import java.util.Set;
 

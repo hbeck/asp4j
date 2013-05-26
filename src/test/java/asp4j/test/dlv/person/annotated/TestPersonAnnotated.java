@@ -1,13 +1,16 @@
 package asp4j.test.dlv.person.annotated;
 
-import asp4j.lang.answerset.AnswerSets;
+import asp4j.lang.AnswerSet;
+import asp4j.program.Program;
 import asp4j.program.ProgramBuilder;
+import asp4j.solver.ReasoningMode;
 import asp4j.solver.SolverDLV;
 import asp4j.solver.object.FilterBinding;
 import asp4j.solver.object.FilterBindingImpl;
 import asp4j.solver.object.ObjectSolver;
 import asp4j.solver.object.ObjectSolverImpl;
 import java.io.File;
+import java.util.List;
 import java.util.Set;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -48,30 +51,27 @@ public class TestPersonAnnotated {
         Female female = new Female(id42);
 
         ObjectSolver objectSolver = new ObjectSolverImpl(new SolverDLV());
-
-        ProgramBuilder<Object> builder = new ProgramBuilder();
-        builder.add(new File(rulefile)).add(person);
-
-        FilterBinding binding = new FilterBindingImpl();
-        binding.add(Male.class).add(Female.class);
-
-        AnswerSets<Object> answerSets = objectSolver.getAnswerSets(builder.build(), binding);
-
-        assertEquals(2,answerSets.asList().size());
-        assertTrue(answerSets.cautiousConsequence().isEmpty());
-        Set<Object> braveConsequence = answerSets.braveConsequence();
+        
+        Program<Object> program = new ProgramBuilder().add(new File(rulefile)).add(person).build();
+        FilterBinding binding = new FilterBindingImpl().add(Male.class).add(Female.class);        
+        List<AnswerSet<Object>> answerSets = objectSolver.getAnswerSets(program, binding);
+        
+        assertEquals(2,answerSets.size());
+        
+        Set<Object> cautiousConsequence = objectSolver.getConsequence(program, binding, ReasoningMode.CAUTIOUS);
+        assertTrue(cautiousConsequence.isEmpty());
+        Set<Object> braveConsequence = objectSolver.getConsequence(program, binding, ReasoningMode.BRAVE);
         assertEquals(2, braveConsequence.size());
         assertTrue(braveConsequence.contains(male));
         assertTrue(braveConsequence.contains(female));
 
         //
         binding.add(Person.class);
-        answerSets = objectSolver.getAnswerSets(builder.build(), binding);
         
-        Set<Object> cautiousConsequence = answerSets.cautiousConsequence();
+        cautiousConsequence = objectSolver.getConsequence(program, binding, ReasoningMode.CAUTIOUS);
         assertEquals(1,cautiousConsequence.size());
         assertTrue(cautiousConsequence.contains(person));
-        braveConsequence = answerSets.braveConsequence();
+        braveConsequence = objectSolver.getConsequence(program, binding, ReasoningMode.BRAVE);
         assertTrue(braveConsequence.contains(male));
         assertTrue(braveConsequence.contains(female));
 

@@ -1,8 +1,8 @@
-package asp4j.lang.answerset;
+package asp4j.lang;
 
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.UnmodifiableIterator;
-import java.util.Collection;
+import asp4j.lang.AnswerSet;
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.Set;
 
 /**
@@ -11,10 +11,10 @@ import java.util.Set;
  */
 public class AnswerSetImpl<T> implements AnswerSet<T> {
 
-    private final ImmutableSet<T> atoms;
+    private final Set<T> atoms;
 
-    public AnswerSetImpl(Collection<T> atoms) {
-        this.atoms=ImmutableSet.<T>builder().addAll(atoms).build();
+    public AnswerSetImpl(Set<T> atoms) {
+        this.atoms=Collections.unmodifiableSet(atoms);
     }
     
     @Override
@@ -26,7 +26,7 @@ public class AnswerSetImpl<T> implements AnswerSet<T> {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append('{');
-        UnmodifiableIterator<T> iterator = atoms.iterator();
+        Iterator<T> iterator = atoms.iterator();
         if (iterator.hasNext()) {
             sb.append(iterator.next());
         }

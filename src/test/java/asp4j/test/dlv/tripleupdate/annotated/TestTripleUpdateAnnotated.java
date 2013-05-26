@@ -1,12 +1,16 @@
 package asp4j.test.dlv.tripleupdate.annotated;
 
-import asp4j.lang.answerset.AnswerSets;
+import asp4j.lang.AnswerSet;
+import asp4j.program.Program;
 import asp4j.program.ProgramBuilder;
+import asp4j.solver.ReasoningMode;
 import asp4j.solver.SolverDLV;
 import asp4j.solver.object.FilterBindingImpl;
 import asp4j.solver.object.ObjectSolver;
 import asp4j.solver.object.ObjectSolverImpl;
 import java.io.File;
+import java.util.List;
+import java.util.Set;
 import org.apache.commons.collections.CollectionUtils;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -41,11 +45,15 @@ public class TestTripleUpdateAnnotated {
         FilterBindingImpl binding = new FilterBindingImpl();
         binding.add(Addition.class);
 
-        AnswerSets<Object> as = objectSolver.getAnswerSets(builder.build(), binding);
+        Program<Object> program = builder.build();
+        List<AnswerSet<Object>> as = objectSolver.getAnswerSets(program, binding);
+        
+        assertEquals(1, as.size());
+        assertTrue(as.get(0).atoms().contains(new Addition(blue_colorOf_car)));
 
-        assertTrue(CollectionUtils.isEqualCollection(as.braveConsequence(), as.cautiousConsequence()));
-        assertEquals(1, as.asList().size());        
-        assertTrue(as.asList().get(0).atoms().contains(new Addition(blue_colorOf_car)));
+        Set<Object> cautiousConsequence = objectSolver.getConsequence(program, binding, ReasoningMode.CAUTIOUS);
+        Set<Object> braveConsequence = objectSolver.getConsequence(program, binding, ReasoningMode.BRAVE);
+        assertTrue(CollectionUtils.isEqualCollection(cautiousConsequence, braveConsequence));
 
     }
 
@@ -81,10 +89,13 @@ public class TestTripleUpdateAnnotated {
 
         FilterBindingImpl binding = new FilterBindingImpl();
         binding.add(Conflict.class);
+        
+        Program<Object> program = builder.build();
 
-        AnswerSets<Object> as = objectSolver.getAnswerSets(builder.build(), binding);
+        Set<Object> cautiousConsequence = objectSolver.getConsequence(program, binding, ReasoningMode.CAUTIOUS);
+        Set<Object> braveConsequence = objectSolver.getConsequence(program, binding, ReasoningMode.BRAVE);
+        assertTrue(CollectionUtils.isEqualCollection(cautiousConsequence, braveConsequence));
 
-        assertTrue(CollectionUtils.isEqualCollection(as.braveConsequence(), as.cautiousConsequence()));
         Conflict expected = new Conflict();
         //confl(single_violation,car,hasColor,blue,red))
         expected.setType("single_violation");
@@ -92,9 +103,11 @@ public class TestTripleUpdateAnnotated {
         expected.setPredicate("hasColor");
         expected.setObject1("blue");
         expected.setObject2("red");
-        assertTrue(as.asList().get(0).atoms().contains(expected));
-        assertEquals(1, as.asList().size());
-        assertEquals(1, as.asList().get(0).atoms().size());
+        
+        List<AnswerSet<Object>> as = objectSolver.getAnswerSets(builder.build(), binding);
+        assertTrue(as.get(0).atoms().contains(expected));
+        assertEquals(1, as.size());
+        assertEquals(1, as.get(0).atoms().size());
     }
 
     private static Statement statement(String subject, String predicate, String object) {
