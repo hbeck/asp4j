@@ -1,4 +1,4 @@
-package asp4j.test.dlv.person.direct;
+package asp4j.test.person.direct;
 
 import asp4j.lang.Atom;
 import asp4j.lang.AtomImpl;

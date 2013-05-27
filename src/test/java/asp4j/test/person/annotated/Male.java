@@ -1,4 +1,4 @@
-package asp4j.test.dlv.person.annotated;
+package asp4j.test.person.annotated;
 
 import asp4j.mapping.annotations.Predicate;
 import java.util.Objects;

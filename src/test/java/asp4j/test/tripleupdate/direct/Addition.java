@@ -1,4 +1,4 @@
-package asp4j.test.dlv.tripleupdate.direct;
+package asp4j.test.tripleupdate.direct;
 
 import asp4j.mapping.direct.CanInitFromAtom;
 import java.util.Objects;

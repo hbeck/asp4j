@@ -1,6 +1,6 @@
-package asp4j.test.dlv.tripleupdate.annotated;
+package asp4j.test.tripleupdate.direct;
 
-import asp4j.mapping.annotations.Predicate;
+import asp4j.mapping.direct.CanInitFromAtom;
 import java.util.Objects;
 import org.openrdf.model.Statement;
 
@@ -9,14 +9,18 @@ import org.openrdf.model.Statement;
  * @author hbeck 
  * date May 15, 2013
  */
-@Predicate("db")
-public class InDatabase extends TypedTriple {
+public class InDatabase extends TypedTriple implements CanInitFromAtom {
 
     public InDatabase() {
     }
 
     public InDatabase(Statement statement) {
         super(statement);
+    }
+
+    @Override
+    public String predicateName() {
+        return "db";
     }
 
     @Override
@@ -28,13 +32,7 @@ public class InDatabase extends TypedTriple {
             return false;
         }
         final InDatabase other = (InDatabase) obj;
-        if (!Objects.equals(this.subject, other.subject)) {
-            return false;
-        }
-        if (!Objects.equals(this.predicate, other.predicate)) {
-            return false;
-        }
-        if (!Objects.equals(this.object, other.object)) {
+        if (!Objects.equals(this.getStatement(), other.getStatement())) {
             return false;
         }
         return true;
@@ -42,6 +40,6 @@ public class InDatabase extends TypedTriple {
 
     @Override
     public int hashCode() {
-        return super.hashCode() * Objects.hash("db");
+        return 59 * Objects.hash(predicateName()) * super.hashCode();
     }
 }

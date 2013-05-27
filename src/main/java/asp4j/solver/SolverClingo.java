@@ -1,36 +1,36 @@
 package asp4j.solver;
 
-import asp4j.lang.AnswerSet;
-import asp4j.lang.AnswerSetImpl;
-import asp4j.lang.Atom;
-import asp4j.lang.AtomImpl;
-import asp4j.program.Program;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import org.apache.commons.io.IOUtils;
 
 /**
  *
- * @author hbeck date April 14, 2013
+ * @author hbeck date May 27, 2013
  */
-public class SolverDLV extends SolverBase {
+public class SolverClingo extends SolverBase {
 
-    protected String tempInputFilename = System.getProperty("user.dir") + "/tmp_dlv_input.lp";
+    protected String tempInputFilename = System.getProperty("user.dir") + "/tmp_clingo_input.lp";
 
     @Override
     protected String solverCommandPrefix() {
-        return "dlv -silent";
+        return "clingo 0 --verbose=0";
     }
 
     @Override
     protected List<String> getAnswerSetStrings(Process exec) throws IOException {
         InputStream inputStream = exec.getInputStream();
-        return IOUtils.readLines(inputStream);
+        List<String> allLines = IOUtils.readLines(inputStream);
+        List<String> answerSetLines = new ArrayList();
+        for (String line : allLines) {
+            if (line.startsWith("%") || line.startsWith("SATISFIABLE")) {
+                continue;
+            }
+            answerSetLines.add(line);
+        }
+        return answerSetLines;
     }
 
     @Override
@@ -40,14 +40,11 @@ public class SolverDLV extends SolverBase {
 
     @Override
     protected String prepareAnswerSetString(String answerSetString) {
-        if (answerSetString.startsWith("{")) {
-            return answerSetString.substring(1, answerSetString.length() - 1);
-        }
         return answerSetString;
     }
 
     @Override
     protected String answerSetDelimiter() {
-        return ", ";
+        return " ";
     }
 }

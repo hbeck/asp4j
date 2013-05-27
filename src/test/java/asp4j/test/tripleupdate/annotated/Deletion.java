@@ -1,6 +1,6 @@
-package asp4j.test.dlv.tripleupdate.direct;
+package asp4j.test.tripleupdate.annotated;
 
-import asp4j.mapping.direct.CanInitFromAtom;
+import asp4j.mapping.annotations.Predicate;
 import java.util.Objects;
 import org.openrdf.model.Statement;
 
@@ -9,18 +9,14 @@ import org.openrdf.model.Statement;
  * @author hbeck 
  * date May 14, 2013
  */
-public class Deletion extends TypedTriple implements CanInitFromAtom {
+@Predicate("del")
+public class Deletion extends TypedTriple {
 
     public Deletion() {
     }
 
     public Deletion(Statement statement) {
         super(statement);
-    }
-
-    @Override
-    public String predicateName() {
-        return "del";
     }
 
     @Override
@@ -32,7 +28,13 @@ public class Deletion extends TypedTriple implements CanInitFromAtom {
             return false;
         }
         final Deletion other = (Deletion) obj;
-        if (!Objects.equals(this.getStatement(), other.getStatement())) {
+        if (!Objects.equals(this.subject, other.subject)) {
+            return false;
+        }
+        if (!Objects.equals(this.predicate, other.predicate)) {
+            return false;
+        }
+        if (!Objects.equals(this.object, other.object)) {
             return false;
         }
         return true;
@@ -40,6 +42,6 @@ public class Deletion extends TypedTriple implements CanInitFromAtom {
 
     @Override
     public int hashCode() {
-        return 59 * Objects.hash(predicateName()) * super.hashCode();
+        return super.hashCode()*Objects.hash("del");
     }
 }

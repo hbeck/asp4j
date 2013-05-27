@@ -1,3 +1,4 @@
 target/
 *~
 TODO
+src/test/java/asp4j/test/rdf/

@@ -1,11 +1,18 @@
 package asp4j.solver;
 
 import asp4j.lang.AnswerSet;
+import asp4j.lang.AnswerSetImpl;
 import asp4j.lang.Atom;
+import asp4j.lang.AtomImpl;
 import asp4j.program.Program;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -14,11 +21,10 @@ import java.util.Set;
 
 /**
  *
- * @author hbeck 
- * date Apr 14, 2013
+ * @author hbeck date Apr 14, 2013
  */
 public abstract class SolverBase implements Solver {
-    
+
     protected int lastProgramHashCode;
     protected List<AnswerSet<Atom>> lastProgramAnswerSets;
 
@@ -27,19 +33,63 @@ public abstract class SolverBase implements Solver {
     }
 
     private void init() {
-        lastProgramAnswerSets=null;
+        lastProgramAnswerSets = null;
     }
-    
+
     protected void clear() {
-        lastProgramAnswerSets=null;
+        lastProgramAnswerSets = null;
     }
 
-    protected void preSolver(Program<Atom> program) throws Exception {        
+    /**
+     *
+     * @return part before list of files
+     */
+    protected abstract String solverCommandPrefix();
+
+    protected String solverCommand(Program<Atom> program) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(solverCommandPrefix());
+        for (File file : program.getFiles()) {
+            sb.append(" ").append(file.getAbsolutePath());
+        }
+        if (!program.getInput().isEmpty()) {
+            sb.append(" ").append(tempInputFilename());
+        }
+        return sb.toString();
     }
 
-    protected abstract String solverCommand(Program<Atom> program);
+    protected abstract String tempInputFilename();
+
+    /**
+     * @return list of filenames as used in command line
+     */
+    protected String generateInputFilenames(Program<Atom> program) {
+        StringBuilder sb = new StringBuilder();
+
+        return sb.toString();
+    }
+
+    protected void preSolver(Program<Atom> program) throws Exception {
+        Collection<Atom> inputAtoms = program.getInput();
+        if (inputAtoms.isEmpty()) {
+            return;
+        }
+        StringBuilder sb = new StringBuilder();
+        for (Atom atom : inputAtoms) {
+            sb.append(atom.toString()).append(" ");
+        }
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(tempInputFilename()))) {
+            writer.write(sb.toString());
+        }
+    }
 
     protected void postSolver(Program<Atom> program) throws Exception {
+        if (program.getInput().isEmpty()) {
+            return;
+        }
+        StringBuilder sb = new StringBuilder();
+        sb.append("rm ").append(tempInputFilename());
+        runVoidExec(sb.toString());
     }
 
     /**
@@ -47,8 +97,32 @@ public abstract class SolverBase implements Solver {
      * comma-separated. {optionally, surrounded, by, braces}
      */
     protected abstract List<String> getAnswerSetStrings(Process exec) throws IOException;
+    
+    /**
+     * 
+     * @param answerSetString
+     * @return string to tokenize based on standard configuration
+     * @see anwerSetDelimiter
+     */
+    protected abstract String prepareAnswerSetString(String answerSetString);
+    protected abstract String answerSetDelimiter();
 
-    protected abstract List<AnswerSet<Atom>> mapAnswerSetStrings(List<String> strings);
+    protected List<AnswerSet<Atom>> mapAnswerSetStrings(List<String> strings) {
+        List<AnswerSet<Atom>> answerSets = new ArrayList();
+        for (String answerSetString : strings) {
+            answerSetString = prepareAnswerSetString(answerSetString);
+            String[] atomStrings = answerSetString.split(answerSetDelimiter());
+            Set<Atom> atoms = new HashSet();
+            for (String atomString : atomStrings) {
+                int idxParen = atomString.indexOf("(");
+                String predicateName = atomString.substring(0, idxParen);
+                String[] args = atomString.substring(idxParen + 1, atomString.length() - 1).split(",");
+                atoms.add(new AtomImpl(predicateName, args));
+            }
+            answerSets.add(new AnswerSetImpl(atoms));
+        }
+        return answerSets;
+    }
 
     protected void runVoidExec(String cmd) throws Exception {
         if (cmd == null || cmd.isEmpty()) {
@@ -69,15 +143,15 @@ public abstract class SolverBase implements Solver {
 
     @Override
     public List<AnswerSet<Atom>> getAnswerSets(Program<Atom> program) throws Exception {
-        if (lastProgramAnswerSets!=null && program.hashCode()==lastProgramHashCode) {
+        if (lastProgramAnswerSets != null && program.hashCode() == lastProgramHashCode) {
             return lastProgramAnswerSets;
         }
-        lastProgramHashCode=program.hashCode();
+        lastProgramHashCode = program.hashCode();
         preSolver(program);
         Process exec = Runtime.getRuntime().exec(solverCommand(program));
         List<String> answerSetStrings = getAnswerSetStrings(exec);
-        postSolver(program);        
-        return lastProgramAnswerSets=Collections.unmodifiableList(mapAnswerSetStrings(answerSetStrings));
+        postSolver(program);
+        return lastProgramAnswerSets = Collections.unmodifiableList(mapAnswerSetStrings(answerSetStrings));
     }
 
     @Override

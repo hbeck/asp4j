@@ -1,4 +1,4 @@
-package asp4j.test.dlv.tripleupdate.direct;
+package asp4j.test.tripleupdate.direct;
 
 import asp4j.mapping.direct.CanInitFromAtom;
 import java.util.Objects;
@@ -7,20 +7,20 @@ import org.openrdf.model.Statement;
 /**
  *
  * @author hbeck 
- * date May 15, 2013
+ * date May 14, 2013
  */
-public class InDatabase extends TypedTriple implements CanInitFromAtom {
+public class Deletion extends TypedTriple implements CanInitFromAtom {
 
-    public InDatabase() {
+    public Deletion() {
     }
 
-    public InDatabase(Statement statement) {
+    public Deletion(Statement statement) {
         super(statement);
     }
 
     @Override
     public String predicateName() {
-        return "db";
+        return "del";
     }
 
     @Override
@@ -31,7 +31,7 @@ public class InDatabase extends TypedTriple implements CanInitFromAtom {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        final InDatabase other = (InDatabase) obj;
+        final Deletion other = (Deletion) obj;
         if (!Objects.equals(this.getStatement(), other.getStatement())) {
             return false;
         }

@@ -20,6 +20,11 @@ public class ProgramBuilder<T> {
         this.input = new HashSet();
         this.files = new HashSet();
     }
+    
+    public ProgramBuilder(Program<T> program) {
+        this.input = new HashSet(program.getInput());
+        this.files = new HashSet(program.getFiles());
+    }
 
     public Program<T> build() {
         return new Program<T>(){

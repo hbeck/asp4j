@@ -1,4 +1,4 @@
-package asp4j.test.dlv.tripleupdate.annotated;
+package asp4j.test.tripleupdate.annotated;
 
 import asp4j.mapping.annotations.Predicate;
 import java.util.Objects;
@@ -9,13 +9,13 @@ import org.openrdf.model.Statement;
  * @author hbeck 
  * date May 14, 2013
  */
-@Predicate("del")
-public class Deletion extends TypedTriple {
+@Predicate("add")
+public class Addition extends TypedTriple {
 
-    public Deletion() {
+    public Addition() {
     }
 
-    public Deletion(Statement statement) {
+    public Addition(Statement statement) {
         super(statement);
     }
 
@@ -27,7 +27,7 @@ public class Deletion extends TypedTriple {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        final Deletion other = (Deletion) obj;
+        final Addition other  = (Addition) obj;
         if (!Objects.equals(this.subject, other.subject)) {
             return false;
         }
@@ -42,6 +42,6 @@ public class Deletion extends TypedTriple {
 
     @Override
     public int hashCode() {
-        return super.hashCode()*Objects.hash("del");
+        return super.hashCode()*Objects.hash("add");
     }
 }

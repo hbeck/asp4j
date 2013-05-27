@@ -6,7 +6,8 @@ Answer Set Programming solver interface for Java
 
 #### Logic program `person.lp`
 
-    female(X) v male(X) :- person(X).
+    female(X) :- person(X), not male(X).
+    male(X)   :- person(X), not female(X).
 
 #### Java classes (beans)
   
@@ -40,12 +41,16 @@ public class Male extends Person {
 }
 ```
 
-#### Using a solver ([DLV](http://www.dlvsystem.com/))
+#### Using a solver
+
+- [dlv](http://www.dlvsystem.com/)
+- [clingo](http://potassco.sourceforge.net/)
 
 ```java
 Person person = new Person("id42");
 
-ObjectSolver solver = new ObjectSolverImpl(new SolverDLV());
+Solver externalSolver = new SolverDLV(); //or new SolverClingo();  
+ObjectSolver solver = new ObjectSolverImpl(externalSolver); 
 
 Program<Object> program = new ProgramBuilder().add(new File("person.lp")).add(person).build();
 FilterBinding binding = new FilterBinding().add(Male.class).add(Female.class);

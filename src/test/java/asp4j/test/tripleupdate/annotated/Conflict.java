@@ -1,4 +1,4 @@
-package asp4j.test.dlv.tripleupdate.annotated;
+package asp4j.test.tripleupdate.annotated;
 
 import asp4j.mapping.annotations.Arg;
 import asp4j.mapping.annotations.Predicate;

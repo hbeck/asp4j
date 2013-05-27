@@ -1,11 +1,12 @@
-package asp4j.test.dlv.person.annotated;
+package asp4j.test.person.annotated;
 
 import asp4j.lang.AnswerSet;
 import asp4j.program.Program;
 import asp4j.program.ProgramBuilder;
 import asp4j.solver.ReasoningMode;
+import asp4j.solver.Solver;
+import asp4j.solver.SolverClingo;
 import asp4j.solver.SolverDLV;
-import asp4j.solver.object.FilterBinding;
 import asp4j.solver.object.FilterBinding;
 import asp4j.solver.object.ObjectSolver;
 import asp4j.solver.object.ObjectSolverImpl;
@@ -22,17 +23,34 @@ import org.junit.Test;
  */
 public class TestPersonAnnotated {
 
-    private final String rulefile = System.getProperty("user.dir") + "/src/test/dlv/person/person.lp";
+    private final String rulefile_common = System.getProperty("user.dir") + "/src/test/common/person.lp";
+    private final String rulefile_dlv = System.getProperty("user.dir") + "/src/test/dlv/person.lp";
+    private final String rulefile_clingo = System.getProperty("user.dir") + "/src/test/clingo/person.lp";
 
-    /**
-     *
-     * @throws Exception
-     */
     @Test
-    public void test() throws Exception {
+    public void test_dlv() throws Exception {
+        test(new SolverDLV(), rulefile_dlv);
+    }
+
+    @Test
+    public void test_clingo() throws Exception {
+        test(new SolverClingo(), rulefile_clingo);
+    }
+
+    @Test
+    public void test_dlv_common() throws Exception {
+        test(new SolverDLV(), rulefile_common);
+    }
+
+    @Test
+    public void test_clingo_common() throws Exception {
+        test(new SolverClingo(), rulefile_common);
+    }
+
+    public void test(Solver externalSolver, String rulefile) throws Exception {
 
         /*
-         * RULES:
+         * (dlv) RULES:
          * male(X) v female(X) :- person(X).
          * 
          * IN:
@@ -48,7 +66,7 @@ public class TestPersonAnnotated {
 
         Person person = new Person("id42");
 
-        ObjectSolver solver = new ObjectSolverImpl(new SolverDLV());
+        ObjectSolver solver = new ObjectSolverImpl(externalSolver);
 
         //"person.lp"
         Program<Object> program = new ProgramBuilder().add(new File(rulefile)).add(person).build();
@@ -75,17 +93,15 @@ public class TestPersonAnnotated {
         cautiousConsequence = solver.getConsequence(program, binding, ReasoningMode.CAUTIOUS);
         // ==> cautiousConsequence.size() == 1
         // ==> cautiousConsequence.contains(person)
-        
+
         assertEquals(1, cautiousConsequence.size());
         assertTrue(cautiousConsequence.contains(person));
-        
+
         //</readme example>
-                
+
         braveConsequence = solver.getConsequence(program, binding, ReasoningMode.BRAVE);
         assertTrue(braveConsequence.contains(new Female("id42")));
         assertTrue(braveConsequence.contains(new Male("id42")));
-
-        
 
     }
 }
