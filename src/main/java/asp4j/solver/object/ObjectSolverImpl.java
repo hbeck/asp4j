@@ -32,12 +32,12 @@ public class ObjectSolverImpl implements ObjectSolver {
         List<AnswerSet<Atom>> answerSets = solver.getAnswerSets(getLowLevelProgram(program));
         List<AnswerSet<Object>> list = new ArrayList();
         for (AnswerSet<Atom> answerSet : answerSets) {
-            list.add(filterMapAnswerSet(answerSet,binding));
+            list.add(filterAndMap(answerSet,binding));
         }
         return Collections.unmodifiableList(list);
     }
 
-    private AnswerSet<Object> filterMapAnswerSet(AnswerSet<Atom> answerSet, FilterBinding binding) throws Exception {
+    private AnswerSet<Object> filterAndMap(AnswerSet<Atom> answerSet, FilterBinding binding) throws Exception {
         Set<Object> as = new HashSet();
         for (Atom atom : answerSet.atoms()) {
             if (binding.getFilterPredicateNames().contains(atom.predicateName())) {
@@ -58,11 +58,11 @@ public class ObjectSolverImpl implements ObjectSolver {
 
     @Override
     public Set<Object> getConsequence(Program<?> program, FilterBinding binding, ReasoningMode mode) throws Exception {
-        Set<Atom> cons = solver.getConsequence(getLowLevelProgram(program), mode);
-        return filterMapSet(cons,binding);
+        Set<Atom> atoms = solver.getConsequence(getLowLevelProgram(program), mode);
+        return filterAndMap(atoms,binding);
     }
     
-    private Set<Object> filterMapSet(Set<Atom> atoms, FilterBinding binding) throws Exception {
+    private Set<Object> filterAndMap(Set<Atom> atoms, FilterBinding binding) throws Exception {
         Set<Object> set = new HashSet();
         for (Atom atom : atoms) {
             if (binding.getFilterPredicateNames().contains(atom.predicateName())) {

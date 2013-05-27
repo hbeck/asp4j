@@ -78,7 +78,6 @@ public abstract class SolverBase implements Solver {
         List<String> answerSetStrings = getAnswerSetStrings(exec);
         postSolver(program);        
         return lastProgramAnswerSets=Collections.unmodifiableList(mapAnswerSetStrings(answerSetStrings));
-
     }
 
     @Override
@@ -95,8 +94,8 @@ public abstract class SolverBase implements Solver {
     }
 
     protected Set<Atom> cautiousConsequence(List<AnswerSet<Atom>> answerSets) {
-        Iterator<AnswerSet<Atom>> it = answerSets.iterator();
         Set<Atom> intersection = new HashSet();
+        Iterator<AnswerSet<Atom>> it = answerSets.iterator();
         if (it.hasNext()) {
             intersection.addAll(it.next().atoms());
             while (it.hasNext()) {

@@ -44,7 +44,7 @@ public abstract class MappingUtils {
         }
     }
 
-    public static <T> T asObject(Class<? extends T> clazz, final Atom atom) throws Exception {
+    public static <T> T asObject(Class<T> clazz, final Atom atom) throws Exception {
         Object object = clazz.newInstance();
         //direct
         if (object instanceof CanInitFromAtom) {
