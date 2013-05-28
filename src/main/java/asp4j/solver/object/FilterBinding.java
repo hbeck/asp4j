@@ -3,13 +3,15 @@ package asp4j.solver.object;
 import asp4j.lang.Atom;
 import asp4j.lang.HasPredicateName;
 import asp4j.mapping.MappingUtils;
+import asp4j.mapping.annotations.Constant;
 import asp4j.mapping.annotations.Predicate;
-import java.lang.annotation.Annotation;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * specifies target instantiation objects to filter ObjectSolver output for
+ * 
  * @author hbeck date May 23, 2013
  */
 public class FilterBinding {
@@ -40,12 +42,16 @@ public class FilterBinding {
     }
 
     private String getPredicateName(Class clazz) throws Exception {
-        Annotation annotation = clazz.getAnnotation(Predicate.class);
-        if (annotation != null) {
-            return ((Predicate)annotation).value();
+        Predicate predicateAnn = (Predicate)clazz.getAnnotation(Predicate.class);
+        if (predicateAnn != null) {
+            return predicateAnn.value();
+        }
+        Constant constAnn = (Constant)clazz.getAnnotation(Constant.class);
+        if (constAnn != null) {
+            return constAnn.value();
         }
         //assume direct
-        Object inst = clazz.newInstance();
+        Object inst = clazz.newInstance();        
         return ((HasPredicateName) inst).predicateName();
     }
 }

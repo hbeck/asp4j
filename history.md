@@ -1,8 +1,8 @@
-### 0.0.2
+0.0.2
 
 - clingo support
   
-### 0.0.1
+0.0.1
 
 - first running version with dlv as solver.
 - simple string-based mapping via interface implementation or via annotations.

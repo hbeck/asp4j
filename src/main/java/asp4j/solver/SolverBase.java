@@ -97,14 +97,15 @@ public abstract class SolverBase implements Solver {
      * comma-separated. {optionally, surrounded, by, braces}
      */
     protected abstract List<String> getAnswerSetStrings(Process exec) throws IOException;
-    
+
     /**
-     * 
+     *
      * @param answerSetString
      * @return string to tokenize based on standard configuration
      * @see anwerSetDelimiter
      */
     protected abstract String prepareAnswerSetString(String answerSetString);
+
     protected abstract String answerSetDelimiter();
 
     protected List<AnswerSet<Atom>> mapAnswerSetStrings(List<String> strings) {
@@ -115,15 +116,25 @@ public abstract class SolverBase implements Solver {
             Set<Atom> atoms = new HashSet();
             for (String atomString : atomStrings) {
                 int idxParen = atomString.indexOf("(");
-                String predicateName = atomString.substring(0, idxParen);
-                String[] args = atomString.substring(idxParen + 1, atomString.length() - 1).split(",");
-                atoms.add(new AtomImpl(predicateName, args));
+                if (idxParen == -1) {
+                    atoms.add(new AtomImpl(atomString));
+                } else {
+                    String predicateName = atomString.substring(0, idxParen);
+                    String[] args = atomString.substring(idxParen + 1, atomString.length() - 1).split(",");
+                    atoms.add(new AtomImpl(predicateName, args));
+                }
             }
             answerSets.add(new AnswerSetImpl(atoms));
         }
         return answerSets;
     }
 
+    /**
+     * run a command and throw an exception in case of errors
+     *
+     * @param cmd
+     * @throws Exception
+     */
     protected void runVoidExec(String cmd) throws Exception {
         if (cmd == null || cmd.isEmpty()) {
             return;
@@ -131,13 +142,17 @@ public abstract class SolverBase implements Solver {
         Process exec = Runtime.getRuntime().exec(cmd);
         BufferedReader errorReader = new BufferedReader(new InputStreamReader(exec.getErrorStream()));
         String line;
+        boolean hasError = false;
+        StringBuilder sb = new StringBuilder();
         while ((line = errorReader.readLine()) != null) {
+            hasError = true;
             System.err.println(line);
+            sb.append(line).append("\n");
         }
         exec.waitFor();
         int exitValue = exec.exitValue();
-        if (exitValue != 0) {
-            throw new Exception(cmd + " exit: " + exitValue);
+        if (exitValue != 0 || hasError) {
+            throw new Exception(cmd + " exit: " + exitValue + "\n error msg: " + sb.toString());
         }
     }
 

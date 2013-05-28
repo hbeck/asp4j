@@ -4,6 +4,7 @@ import asp4j.lang.Atom;
 import asp4j.lang.HasPredicateName;
 
 /**
+ * Objects that can directly initialized given an Atom
  *
  * @author hbeck
  * date May 14, 2013

@@ -140,7 +140,7 @@ public class TestTripleUpdateDirect {
         Statement red_colorOf_car = statement("urn:red", "urn:colorOf", "urn:car");
         Statement car_hasColor_red = statement("urn:car", "urn:hasColor", "urn:red");
 
-        ObjectSolver objectSolver = new ObjectSolverImpl(externalSolver);
+        ObjectSolver solver = new ObjectSolverImpl(externalSolver);
 
         Program<CanAsAtom> program = new ProgramBuilder()
                 .add(new File(rulefile))
@@ -153,8 +153,8 @@ public class TestTripleUpdateDirect {
 
         FilterBinding binding = new FilterBinding().add(Conflict.class);
 
-        Set<Object> cautiousConsequence = objectSolver.getConsequence(program, binding, ReasoningMode.CAUTIOUS);
-        Set<Object> braveConsequence = objectSolver.getConsequence(program, binding, ReasoningMode.BRAVE);
+        Set<Object> cautiousConsequence = solver.getConsequence(program, binding, ReasoningMode.CAUTIOUS);
+        Set<Object> braveConsequence = solver.getConsequence(program, binding, ReasoningMode.BRAVE);
         assertTrue(CollectionUtils.isEqualCollection(cautiousConsequence, braveConsequence));
 
         Conflict expected = new Conflict();
@@ -162,10 +162,17 @@ public class TestTripleUpdateDirect {
         expected.setType("single_violation");
         expected.setStatement1(car_hasColor_blue);
         expected.setStatement2(car_hasColor_red);
-        List<AnswerSet<Object>> as = objectSolver.getAnswerSets(program, binding);
+        List<AnswerSet<Object>> as = solver.getAnswerSets(program, binding);
         assertTrue(as.get(0).atoms().contains(expected));
         assertEquals(1, as.size());
         assertEquals(1, as.get(0).atoms().size());
+        
+        //
+        binding = new FilterBinding().add(SomeConflict.class);
+        Set<Object> cons = solver.getConsequence(program, binding, ReasoningMode.CAUTIOUS);
+        assertEquals(1, cons.size());
+        assertEquals(new SomeConflict(),(SomeConflict)cons.iterator().next());        
+        
     }
 
     private static Statement statement(String subject, String predicate, String object) {
