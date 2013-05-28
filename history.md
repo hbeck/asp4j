@@ -1,6 +1,7 @@
 0.0.2
 
 - clingo support
+- constant class annotation
   
 0.0.1
 

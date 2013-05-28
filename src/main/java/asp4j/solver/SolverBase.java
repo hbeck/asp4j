@@ -5,12 +5,10 @@ import asp4j.lang.AnswerSetImpl;
 import asp4j.lang.Atom;
 import asp4j.lang.AtomImpl;
 import asp4j.program.Program;
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -25,72 +23,21 @@ import java.util.Set;
  */
 public abstract class SolverBase implements Solver {
 
+    protected File inputFile;
     protected int lastProgramHashCode;
     protected List<AnswerSet<Atom>> lastProgramAnswerSets;
 
     public SolverBase() {
-        init();
-    }
-
-    private void init() {
-        lastProgramAnswerSets = null;
-    }
-
-    protected void clear() {
+        inputFile = null;
         lastProgramAnswerSets = null;
     }
 
     /**
+     * command to start the solver, including params (excluding input programs)
      *
      * @return part before list of files
      */
-    protected abstract String solverCommandPrefix();
-
-    protected String solverCommand(Program<Atom> program) {
-        StringBuilder sb = new StringBuilder();
-        sb.append(solverCommandPrefix());
-        for (File file : program.getFiles()) {
-            sb.append(" ").append(file.getAbsolutePath());
-        }
-        if (!program.getInput().isEmpty()) {
-            sb.append(" ").append(tempInputFilename());
-        }
-        return sb.toString();
-    }
-
-    protected abstract String tempInputFilename();
-
-    /**
-     * @return list of filenames as used in command line
-     */
-    protected String generateInputFilenames(Program<Atom> program) {
-        StringBuilder sb = new StringBuilder();
-
-        return sb.toString();
-    }
-
-    protected void preSolver(Program<Atom> program) throws Exception {
-        Collection<Atom> inputAtoms = program.getInput();
-        if (inputAtoms.isEmpty()) {
-            return;
-        }
-        StringBuilder sb = new StringBuilder();
-        for (Atom atom : inputAtoms) {
-            sb.append(atom.toString()).append(" ");
-        }
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(tempInputFilename()))) {
-            writer.write(sb.toString());
-        }
-    }
-
-    protected void postSolver(Program<Atom> program) throws Exception {
-        if (program.getInput().isEmpty()) {
-            return;
-        }
-        StringBuilder sb = new StringBuilder();
-        sb.append("rm ").append(tempInputFilename());
-        runVoidExec(sb.toString());
-    }
+    protected abstract String solverCommand();
 
     /**
      * @return list of strings, each representing an answer set. atoms
@@ -99,6 +46,8 @@ public abstract class SolverBase implements Solver {
     protected abstract List<String> getAnswerSetStrings(Process exec) throws IOException;
 
     /**
+     * prepare answer set string for tokenization. e.g. surrounding braces may
+     * be removed.
      *
      * @param answerSetString
      * @return string to tokenize based on standard configuration
@@ -106,13 +55,40 @@ public abstract class SolverBase implements Solver {
      */
     protected abstract String prepareAnswerSetString(String answerSetString);
 
-    protected abstract String answerSetDelimiter();
+    /**
+     * @return separator of atoms withing an answer set
+     */
+    protected abstract String atomDelimiter();
 
-    protected List<AnswerSet<Atom>> mapAnswerSetStrings(List<String> strings) {
+    //
+    //  std implementations
+    //
+    protected void clear() {
+        lastProgramAnswerSets = null;
+    }
+
+    @Override
+    public List<AnswerSet<Atom>> getAnswerSets(Program<Atom> program) throws Exception {
+        if (lastProgramAnswerSets != null && program.hashCode() == lastProgramHashCode) {
+            return lastProgramAnswerSets;
+        }
+        lastProgramHashCode = program.hashCode();
+        preSolverExec(program);
+        Process exec = Runtime.getRuntime().exec(solverCallString(program));
+        List<String> answerSetStrings = getAnswerSetStrings(exec);
+        postSolverExec(program);
+        return lastProgramAnswerSets = Collections.unmodifiableList(mapAnswerSetStrings(answerSetStrings));
+    }
+
+    /**
+     * maps a list of answer sets, represented as strings, to a list of (low
+     * level) AnswerSet objects
+     */
+    protected List<AnswerSet<Atom>> mapAnswerSetStrings(List<String> answerSetStrings) {
         List<AnswerSet<Atom>> answerSets = new ArrayList();
-        for (String answerSetString : strings) {
+        for (String answerSetString : answerSetStrings) {
             answerSetString = prepareAnswerSetString(answerSetString);
-            String[] atomStrings = answerSetString.split(answerSetDelimiter());
+            String[] atomStrings = answerSetString.split(atomDelimiter());
             Set<Atom> atoms = new HashSet();
             for (String atomString : atomStrings) {
                 int idxParen = atomString.indexOf("(");
@@ -127,46 +103,6 @@ public abstract class SolverBase implements Solver {
             answerSets.add(new AnswerSetImpl(atoms));
         }
         return answerSets;
-    }
-
-    /**
-     * run a command and throw an exception in case of errors
-     *
-     * @param cmd
-     * @throws Exception
-     */
-    protected void runVoidExec(String cmd) throws Exception {
-        if (cmd == null || cmd.isEmpty()) {
-            return;
-        }
-        Process exec = Runtime.getRuntime().exec(cmd);
-        BufferedReader errorReader = new BufferedReader(new InputStreamReader(exec.getErrorStream()));
-        String line;
-        boolean hasError = false;
-        StringBuilder sb = new StringBuilder();
-        while ((line = errorReader.readLine()) != null) {
-            hasError = true;
-            System.err.println(line);
-            sb.append(line).append("\n");
-        }
-        exec.waitFor();
-        int exitValue = exec.exitValue();
-        if (exitValue != 0 || hasError) {
-            throw new Exception(cmd + " exit: " + exitValue + "\n error msg: " + sb.toString());
-        }
-    }
-
-    @Override
-    public List<AnswerSet<Atom>> getAnswerSets(Program<Atom> program) throws Exception {
-        if (lastProgramAnswerSets != null && program.hashCode() == lastProgramHashCode) {
-            return lastProgramAnswerSets;
-        }
-        lastProgramHashCode = program.hashCode();
-        preSolver(program);
-        Process exec = Runtime.getRuntime().exec(solverCommand(program));
-        List<String> answerSetStrings = getAnswerSetStrings(exec);
-        postSolver(program);
-        return lastProgramAnswerSets = Collections.unmodifiableList(mapAnswerSetStrings(answerSetStrings));
     }
 
     @Override
@@ -200,5 +136,54 @@ public abstract class SolverBase implements Solver {
             set.addAll(answerSet.atoms());
         }
         return Collections.unmodifiableSet(set);
+    }
+
+    /**
+     *
+     * @param program
+     * @return full call to solver, i.e., solver command plus programs
+     * @throws IOException
+     */
+    protected String solverCallString(Program<Atom> program) throws IOException {
+        StringBuilder sb = new StringBuilder();
+        sb.append(solverCommand());
+        for (File file : program.getFiles()) {
+            sb.append(" ").append(file.getAbsolutePath());
+        }
+        if (!program.getInput().isEmpty()) {
+            sb.append(" ").append(inputFile.getAbsolutePath());
+        }
+        return sb.toString();
+    }
+
+    protected File tempInputFile() throws IOException {
+        if (inputFile == null) {
+            inputFile = File.createTempFile("tmp-program", ".lp");
+            inputFile.deleteOnExit();
+        }
+        return inputFile;
+    }
+
+    /**
+     * executed before call to solver
+     */
+    protected void preSolverExec(Program<Atom> program) throws Exception {
+        Collection<Atom> inputAtoms = program.getInput();
+        if (inputAtoms.isEmpty()) {
+            return;
+        }
+        StringBuilder sb = new StringBuilder();
+        for (Atom atom : inputAtoms) {
+            sb.append(atom.toString()).append(" ");
+        }
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(tempInputFile()))) {
+            writer.write(sb.toString());
+        }
+    }
+
+    /**
+     * executed after call to solver
+     */
+    protected void postSolverExec(Program<Atom> program) throws Exception {
     }
 }

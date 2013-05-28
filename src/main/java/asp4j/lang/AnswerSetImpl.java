@@ -1,6 +1,5 @@
 package asp4j.lang;
 
-import asp4j.lang.AnswerSet;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Set;

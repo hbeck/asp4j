@@ -12,10 +12,8 @@ import org.apache.commons.io.IOUtils;
  */
 public class SolverClingo extends SolverBase {
 
-    protected String tempInputFilename = System.getProperty("user.dir") + "/tmp_clingo_input.lp";
-
     @Override
-    protected String solverCommandPrefix() {
+    protected String solverCommand() {
         return "clingo 0 --verbose=0";
     }
 
@@ -34,17 +32,12 @@ public class SolverClingo extends SolverBase {
     }
 
     @Override
-    protected String tempInputFilename() {
-        return tempInputFilename;
-    }
-
-    @Override
     protected String prepareAnswerSetString(String answerSetString) {
         return answerSetString;
     }
 
     @Override
-    protected String answerSetDelimiter() {
+    protected String atomDelimiter() {
         return " ";
     }
 }
