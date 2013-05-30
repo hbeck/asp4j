@@ -1,26 +1,27 @@
-package asp4j.test.annotated.tripleupdate.term;
+package asp4j.test.direct.tripleupdate.term;
 
-import asp4j.mapping.annotations.Arg;
-import asp4j.mapping.annotations.DefAtom;
+import asp4j.lang.Atom;
+import asp4j.lang.AtomImpl;
+import asp4j.lang.Term;
+import asp4j.mapping.direct.CanAsAtom;
+import asp4j.mapping.direct.CanInitFromAtom;
 import java.util.Objects;
 
 /**
  *
  * @author hbeck May 30, 2013
  */
-@DefAtom("del")
-public class Deletion {
-    
+public class Deletion implements CanAsAtom, CanInitFromAtom {
+
     private Triple triple;
 
     public Deletion() {
     }
 
     public Deletion(Triple triple) {
-        this.triple=triple;
+        this.triple = triple;
     }
 
-    @Arg(0)
     public Triple getTriple() {
         return triple;
     }
@@ -33,7 +34,7 @@ public class Deletion {
     public int hashCode() {
         int hash = 7;
         hash = 97 * hash + Objects.hashCode(this.triple);
-        hash = 97 * hash + Objects.hashCode("del");        
+        hash = 97 * hash + Objects.hashCode("del");
         return hash;
     }
 
@@ -50,5 +51,22 @@ public class Deletion {
             return false;
         }
         return true;
-    }    
+    }
+
+    @Override
+    public Atom asAtom() {
+        return new AtomImpl(symbol(), new Term[]{triple.asTerm()});
+    }
+
+    @Override
+    public void init(Atom atom) {
+        Triple t = new Triple();
+        t.init(atom.getArg(0));
+        this.triple = t;
+    }
+
+    @Override
+    public String symbol() {
+        return "del";
+    }
 }

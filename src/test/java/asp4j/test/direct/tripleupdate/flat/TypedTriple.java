@@ -4,8 +4,6 @@ import asp4j.lang.Atom;
 import asp4j.lang.AtomImpl;
 import asp4j.lang.Constant;
 import asp4j.lang.ConstantImpl;
-import asp4j.lang.Term;
-import asp4j.lang.TermImpl;
 import asp4j.mapping.direct.CanAsAtom;
 import java.util.Objects;
 import org.openrdf.model.Statement;

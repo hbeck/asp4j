@@ -21,7 +21,7 @@ public abstract class ParseUtils {
      * @return
      * @throws ParseException
      */
-    protected static Term parseTerm(String termString) throws ParseException {
+    public static Term parseTerm(String termString) throws ParseException {
         int parenIdx = termString.indexOf("(");
         if (parenIdx == -1) {
             return new ConstantImpl(termString);

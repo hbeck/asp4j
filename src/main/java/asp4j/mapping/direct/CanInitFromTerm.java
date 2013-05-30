@@ -10,7 +10,7 @@ import asp4j.lang.Term;
  * date May 30, 2013
  */
 public interface CanInitFromTerm extends HasSymbol {
-    
+
     void init(Term term);
     
 }
