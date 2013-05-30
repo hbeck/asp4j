@@ -1,4 +1,4 @@
-package asp4j.test.annotated.tripleupdate.flat;
+package asp4j.test.annotated.tripleupdate.term;
 
 import asp4j.lang.AnswerSet;
 import asp4j.program.Program;
@@ -17,17 +17,16 @@ import org.apache.commons.collections.CollectionUtils;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import org.junit.Test;
-import org.openrdf.model.Statement;
 import org.openrdf.model.impl.StatementImpl;
 import org.openrdf.model.impl.URIImpl;
 
 /**
  *
- * @author hbeck date May 14, 2013
+ * @author hbeck date May 30, 2013
  */
-public class TestTripleUpdateAnnotated {
+public class TestTripleUpdateAnnotatedTerm {
 
-    private final String rulefile_common = System.getProperty("user.dir") + "/src/test/common/triple-update-flat.lp";
+    private final String rulefile_common = System.getProperty("user.dir") + "/src/test/common/triple-update-term.lp";
 
     @Test
     public void test_dlv_common() throws Exception {
@@ -51,11 +50,11 @@ public class TestTripleUpdateAnnotated {
 
     public void test(Solver externalSolver, String rulefile) throws Exception {
 
-        Statement car_hasColor_blue = statement("urn:car", "urn:hasColor", "urn:blue");
-        Statement blue_colorOf_car = statement("urn:blue", "urn:colorOf", "urn:car");
-        Statement hasColor_inverseOf_colorOf = statement("urn:hasColor", "urn:inverseOf", "urn:colorOf");
+        Triple car_hasColor_blue = triple("urn:car", "urn:hasColor", "urn:blue");
+        Triple blue_colorOf_car = triple("urn:blue", "urn:colorOf", "urn:car");
+        Triple hasColor_inverseOf_colorOf = triple("urn:hasColor", "urn:inverseOf", "urn:colorOf");
 
-        ObjectSolver objectSolver = new ObjectSolverImpl(externalSolver); //Solver<Object>
+        ObjectSolver solver = new ObjectSolverImpl(externalSolver); //Solver<Object>
 
         Program<Object> program = new ProgramBuilder()
                 .add(new File(rulefile))
@@ -65,13 +64,13 @@ public class TestTripleUpdateAnnotated {
 
         FilterBinding binding = new FilterBinding().add(Addition.class);
  
-        List<AnswerSet<Object>> as = objectSolver.getAnswerSets(program, binding);
+        List<AnswerSet<Object>> as = solver.getAnswerSets(program, binding);
 
         assertEquals(1, as.size());
         assertTrue(as.get(0).atoms().contains(new Addition(blue_colorOf_car)));
 
-        Set<Object> cautiousConsequence = objectSolver.getConsequence(program, binding, ReasoningMode.CAUTIOUS);
-        Set<Object> braveConsequence = objectSolver.getConsequence(program, binding, ReasoningMode.BRAVE);
+        Set<Object> cautiousConsequence = solver.getConsequence(program, binding, ReasoningMode.CAUTIOUS);
+        Set<Object> braveConsequence = solver.getConsequence(program, binding, ReasoningMode.BRAVE);
         assertTrue(CollectionUtils.isEqualCollection(cautiousConsequence, braveConsequence));
 
     }
@@ -88,12 +87,12 @@ public class TestTripleUpdateAnnotated {
          * --> confl(single_violation(car,hasColor,blue,red))
          */
 
-        Statement hasColor_inverseOf_colorOf = statement("urn:hasColor", "urn:inverseOf", "urn:colorOf");
-        Statement hasColor_type_single = statement("urn:hasColor", "urn:type", "urn:single");
-        Statement car_hasColor_blue = statement("urn:car", "urn:hasColor", "urn:blue");
-        Statement blue_colorOf_car = statement("urn:blue", "urn:colorOf", "urn:car");
-        Statement red_colorOf_car = statement("urn:red", "urn:colorOf", "urn:car");
-        //Statement car_hasColor_red = statement("urn:car", "urn:hasColor", "urn:red");
+        Triple hasColor_inverseOf_colorOf = triple("urn:hasColor", "urn:inverseOf", "urn:colorOf");
+        Triple hasColor_type_single = triple("urn:hasColor", "urn:type", "urn:single");
+        Triple car_hasColor_blue = triple("urn:car", "urn:hasColor", "urn:blue");
+        Triple blue_colorOf_car = triple("urn:blue", "urn:colorOf", "urn:car");
+        Triple red_colorOf_car = triple("urn:red", "urn:colorOf", "urn:car");
+        Triple car_hasColor_red = triple("urn:car", "urn:hasColor", "urn:red");
 
         ObjectSolver solver = new ObjectSolverImpl(externalSolver);
 
@@ -115,10 +114,8 @@ public class TestTripleUpdateAnnotated {
         Conflict expected = new Conflict();
         //confl(single_violation,car,hasColor,blue,red))
         expected.setType("single_violation");
-        expected.setSubject("car");
-        expected.setPredicate("hasColor");
-        expected.setObject1("blue");
-        expected.setObject2("red");
+        expected.setT1(car_hasColor_blue);
+        expected.setT2(car_hasColor_red);
 
         List<AnswerSet<Object>> as = solver.getAnswerSets(program, binding);
         assertTrue(as.get(0).atoms().contains(expected));
@@ -132,7 +129,7 @@ public class TestTripleUpdateAnnotated {
         assertEquals(new SomeConflict(),(SomeConflict)cons.iterator().next());
     }
 
-    private static Statement statement(String subject, String predicate, String object) {
-        return new StatementImpl(new URIImpl(subject), new URIImpl(predicate), new URIImpl(object));
+    private static Triple triple(String subject, String predicate, String object) {
+        return new Triple(new StatementImpl(new URIImpl(subject), new URIImpl(predicate), new URIImpl(object)));
     }
 }

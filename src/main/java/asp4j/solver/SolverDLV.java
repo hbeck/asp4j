@@ -2,14 +2,15 @@ package asp4j.solver;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.io.IOUtils;
 
 /**
  *
- * @author hbeck date April 14, 2013
+ * @author hbeck date Apr 14, 2013
  */
-public class SolverDLV extends SolverBase {    
+public class SolverDLV extends SolverBase {
 
     @Override
     protected String solverCommand() {
@@ -19,15 +20,28 @@ public class SolverDLV extends SolverBase {
     @Override
     protected List<String> getAnswerSetStrings(Process exec) throws IOException {
         InputStream inputStream = exec.getInputStream();
-        return IOUtils.readLines(inputStream);
+        List<String> allLines = IOUtils.readLines(inputStream);
+        if (allLines.isEmpty()) {
+            throw new IOException("dlv output error: lines empty");
+        }
+        List<String> answerSetLines = new ArrayList();
+        for (String line : allLines) {
+            if (!line.startsWith("{")) {
+                throw new IOException("dlv output error: not an answer set: "+line);
+            }
+            answerSetLines.add(line);
+        }
+        return answerSetLines;
     }
 
+    /**
+     * 
+     * @param answerSetString "{atom_1,...,atom_n}"
+     * @return "atom_1,...,atom_n"
+     */
     @Override
     protected String prepareAnswerSetString(String answerSetString) {
-        if (answerSetString.startsWith("{")) {
-            return answerSetString.substring(1, answerSetString.length() - 1);
-        }
-        return answerSetString;
+        return answerSetString.substring(1, answerSetString.length() - 1);
     }
 
     @Override

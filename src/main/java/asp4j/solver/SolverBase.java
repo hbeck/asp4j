@@ -168,7 +168,7 @@ public abstract class SolverBase implements Solver {
         }
         StringBuilder sb = new StringBuilder();
         for (Atom atom : inputAtoms) {
-            sb.append(atom.toString()).append(" ");
+            sb.append(atom.toString());
         }
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(tempInputFile()))) {
             writer.write(sb.toString());

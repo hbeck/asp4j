@@ -2,7 +2,7 @@
 
 Answer Set Programming solver interface for Java
 
-**Version 0.0.2-SNAPSHOT. Last update May 28, 2013**
+**Version 0.0.2-SNAPSHOT. Last update May 30, 2013**
 
 ## Example
 
@@ -14,7 +14,7 @@ Answer Set Programming solver interface for Java
 #### Java classes (beans)
   
 ```java  
-@Predicate("person")
+@DefAtom("person")
 public class Person {    
     protected String id;
     public Person() {
@@ -32,12 +32,12 @@ public class Person {
     //equals ...  
 }
 
-@Predicate("female")
+@DefAtom("female")
 public class Female extends Person {
     //constructors, equals ...
 }
 
-@Predicate("male")
+@DefAtom("male")
 public class Male extends Person {
   //constructors, equals ...
 }

@@ -34,7 +34,7 @@ public abstract class MappingUtils {
             //annotation
             Class<?> clazz = object.getClass();
             DefAtom atomAnn = clazz.getAnnotation(DefAtom.class);
-            String functionSymbol = atomAnn.value();
+            String predicateSymbol = atomAnn.value();
             Map<Integer, Term> termMap = new HashMap();
             for (Method method : clazz.getMethods()) {
                 Arg argAnnotation = method.getAnnotation(Arg.class);
@@ -45,7 +45,7 @@ public abstract class MappingUtils {
                 Object returnedObject = method.invoke(object);
                 termMap.put(Integer.valueOf(arg), asTerm(returnedObject));
             }
-            return new AtomImpl(functionSymbol, asArray(termMap));
+            return new AtomImpl(predicateSymbol, asArray(termMap));
         } catch (SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
             System.err.println(e);
             return null;
@@ -141,4 +141,5 @@ public abstract class MappingUtils {
         }
         return arr;
     }
+    
 }

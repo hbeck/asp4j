@@ -16,8 +16,7 @@ import java.util.Set;
 
 /**
  *
- * @author hbeck 
- * date May 25, 2013
+ * @author hbeck May 25, 2013
  */
 public class ObjectSolverImpl implements ObjectSolver {
 
@@ -32,11 +31,18 @@ public class ObjectSolverImpl implements ObjectSolver {
         List<AnswerSet<Atom>> answerSets = solver.getAnswerSets(getLowLevelProgram(program));
         List<AnswerSet<Object>> list = new ArrayList();
         for (AnswerSet<Atom> answerSet : answerSets) {
-            list.add(filterAndMap(answerSet,binding));
+            list.add(filterAndMap(answerSet, binding));
         }
         return Collections.unmodifiableList(list);
     }
 
+    @Override
+    public Set<Object> getConsequence(Program<?> program, FilterBinding binding, ReasoningMode mode) throws Exception {
+        Set<Atom> atoms = solver.getConsequence(getLowLevelProgram(program), mode);
+        return filterAndMap(atoms, binding);
+    }
+
+    //
     private AnswerSet<Object> filterAndMap(AnswerSet<Atom> answerSet, FilterBinding binding) throws Exception {
         Set<Object> as = new HashSet();
         for (Atom atom : answerSet.atoms()) {
@@ -47,21 +53,15 @@ public class ObjectSolverImpl implements ObjectSolver {
         return new AnswerSetImpl(as);
     }
 
-    private <In> Program<Atom> getLowLevelProgram(Program<In> program) throws Exception {
+    private <T> Program<Atom> getLowLevelProgram(Program<T> program) throws Exception {
         ProgramBuilder<Atom> builder = new ProgramBuilder();
         builder.addFiles(program.getFiles());
-        for (In input : program.getInput()) {
+        for (T input : program.getInput()) {
             builder.add(MappingUtils.asAtom(input));
         }
         return builder.build();
     }
 
-    @Override
-    public Set<Object> getConsequence(Program<?> program, FilterBinding binding, ReasoningMode mode) throws Exception {
-        Set<Atom> atoms = solver.getConsequence(getLowLevelProgram(program), mode);
-        return filterAndMap(atoms,binding);
-    }
-    
     private Set<Object> filterAndMap(Set<Atom> atoms, FilterBinding binding) throws Exception {
         Set<Object> set = new HashSet();
         for (Atom atom : atoms) {

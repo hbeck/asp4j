@@ -1,9 +1,11 @@
 0.0.2
 
-- clingo support
-- constant class annotation
+- solver clingo supported
+- terms and constants
   
 0.0.1
 
-- first running version with dlv as solver.
-- simple string-based mapping via interface implementation or via annotations.
+- first running version
+- solver dlv supported
+- mapping via interface implementations
+- mapping via annotations

@@ -42,6 +42,10 @@ public class AtomImpl implements Atom {
         return predicateSymbol;
     }
 
+    /**
+     * 
+     * @return (grounded) atom representation in standard syntax (with closing dot)
+     */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
@@ -51,9 +55,8 @@ public class AtomImpl implements Atom {
             for (int i = 1; i < args.length; i++) {
                 sb.append(",").append(args[i].toString());
             }
-            sb.append(")");
+            sb.append(").");
         }
-        sb.append(".");
         return sb.toString();
     }
 
@@ -80,9 +83,11 @@ public class AtomImpl implements Atom {
         if (this.arity()!=other.arity()) {
             return false;
         }
-        for (int i=0; i<this.args.length; i++) {
-            if (!this.getArg(i).equals(other.getArg(i))) {
-                return false;
+        if (this.args!=null) {
+            for (int i=0; i<args.length; i++) {
+                if (!this.getArg(i).equals(other.getArg(i))) {
+                    return false;
+                }
             }
         }
         return true;

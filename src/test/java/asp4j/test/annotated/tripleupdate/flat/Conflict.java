@@ -9,8 +9,7 @@ import org.openrdf.model.impl.URIImpl;
 
 /**
  *
- * @author hbeck
- * date May 24, 2013
+ * @author hbeck May 24, 2013
  */
 @DefAtom("confl")
 public class Conflict {
@@ -26,7 +25,7 @@ public class Conflict {
         arr[0] = new StatementImpl(new URIImpl("urn:" + subject),
                 new URIImpl("urn:" + predicate),
                 new URIImpl("urn:" + object1));
-        arr[2] = new StatementImpl(new URIImpl("urn:" + subject),
+        arr[1] = new StatementImpl(new URIImpl("urn:" + subject),
                 new URIImpl("urn:" + predicate),
                 new URIImpl("urn:" + object2));
         return arr;
