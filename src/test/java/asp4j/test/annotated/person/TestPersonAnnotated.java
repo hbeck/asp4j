@@ -62,8 +62,6 @@ public class TestPersonAnnotated {
          * {female(id42). person(id42).}
          */
 
-        //<readme example>
-
         Person person = new Person("id42");
 
         ObjectSolver solver = new ObjectSolverImpl(externalSolver);
@@ -96,8 +94,6 @@ public class TestPersonAnnotated {
 
         assertEquals(1, cautiousConsequence.size());
         assertTrue(cautiousConsequence.contains(person));
-
-        //</readme example>
 
         braveConsequence = solver.getConsequence(program, binding, ReasoningMode.BRAVE);
         assertTrue(braveConsequence.contains(new Female("id42")));
