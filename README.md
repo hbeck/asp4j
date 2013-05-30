@@ -1,7 +1,8 @@
 # asp4j
-**Version 0.0.2-SNAPSHOT. Last update May 28, 2013**
 
 Answer Set Programming solver interface for Java
+
+**Version 0.0.2-SNAPSHOT. Last update May 28, 2013**
 
 ## Example
 

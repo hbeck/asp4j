@@ -1,10 +1,9 @@
 package asp4j.solver.object;
 
 import asp4j.lang.Atom;
-import asp4j.lang.HasPredicateName;
+import asp4j.lang.HasSymbol;
 import asp4j.mapping.MappingUtils;
-import asp4j.mapping.annotations.Constant;
-import asp4j.mapping.annotations.Predicate;
+import asp4j.mapping.annotations.DefAtom;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -37,21 +36,17 @@ public class FilterBinding {
     }
 
     public Object asObject(final Atom atom) throws Exception {
-        Class clazz = predicate2class.get(atom.predicateName());
+        Class clazz = predicate2class.get(atom.symbol());
         return MappingUtils.asObject(clazz, atom);
     }
 
     private String getPredicateName(Class clazz) throws Exception {
-        Predicate predicateAnn = (Predicate)clazz.getAnnotation(Predicate.class);
+        DefAtom predicateAnn = (DefAtom)clazz.getAnnotation(DefAtom.class);
         if (predicateAnn != null) {
             return predicateAnn.value();
-        }
-        Constant constAnn = (Constant)clazz.getAnnotation(Constant.class);
-        if (constAnn != null) {
-            return constAnn.value();
-        }
+        }        
         //assume direct
         Object inst = clazz.newInstance();        
-        return ((HasPredicateName) inst).predicateName();
+        return ((HasSymbol) inst).symbol();
     }
 }

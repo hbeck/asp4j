@@ -2,11 +2,18 @@ package asp4j.mapping;
 
 import asp4j.lang.Atom;
 import asp4j.lang.AtomImpl;
+import asp4j.lang.Constant;
+import asp4j.lang.ConstantImpl;
+import asp4j.lang.HasArgs;
+import asp4j.lang.Term;
+import asp4j.lang.TermImpl;
 import asp4j.mapping.annotations.Arg;
-import asp4j.mapping.annotations.Constant;
-import asp4j.mapping.annotations.Predicate;
+import asp4j.mapping.annotations.DefAtom;
+import asp4j.mapping.annotations.DefTerm;
 import asp4j.mapping.direct.CanAsAtom;
+import asp4j.mapping.direct.CanAsTerm;
 import asp4j.mapping.direct.CanInitFromAtom;
+import asp4j.mapping.direct.CanInitFromTerm;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -26,23 +33,49 @@ public abstract class MappingUtils {
             }
             //annotation
             Class<?> clazz = object.getClass();
-            Predicate predicateAnn = clazz.getAnnotation(Predicate.class);
-            if (predicateAnn == null) {
-                String predicateName = clazz.getAnnotation(Constant.class).value();
-                return new AtomImpl(predicateName);
-            }
-            String predicateName = predicateAnn.value();
-            Map<Integer, String> argsMap = new HashMap();
+            DefAtom atomAnn = clazz.getAnnotation(DefAtom.class);
+            String functionSymbol = atomAnn.value();
+            Map<Integer, Term> termMap = new HashMap();
             for (Method method : clazz.getMethods()) {
                 Arg argAnnotation = method.getAnnotation(Arg.class);
                 if (argAnnotation == null) {
                     continue;
                 }
                 int arg = argAnnotation.value();
-                String argValue = (String) method.invoke(object);
-                argsMap.put(Integer.valueOf(arg), argValue);
+                Object returnedObject = method.invoke(object);
+                termMap.put(Integer.valueOf(arg), asTerm(returnedObject));
             }
-            return new AtomImpl(predicateName, asArray(argsMap));
+            return new AtomImpl(functionSymbol, asArray(termMap));
+        } catch (SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+            System.err.println(e);
+            return null;
+        }
+    }
+
+    public static Term asTerm(final Object object) {
+        try {
+            //direct
+            if (object instanceof CanAsTerm) {
+                return ((CanAsTerm) object).asTerm();
+            }
+            if (object instanceof String) {
+                return new ConstantImpl((String) object);
+            }
+            //annotation
+            Class<?> clazz = object.getClass();
+            DefTerm termAnn = clazz.getAnnotation(DefTerm.class);
+            String functionSymbol = termAnn.value();
+            Map<Integer, Term> termMap = new HashMap();
+            for (Method method : clazz.getMethods()) {
+                Arg argAnnotation = method.getAnnotation(Arg.class);
+                if (argAnnotation == null) {
+                    continue;
+                }
+                int arg = argAnnotation.value();
+                Object returnedObject = method.invoke(object);
+                termMap.put(Integer.valueOf(arg), asTerm(returnedObject));
+            }
+            return new TermImpl(functionSymbol, asArray(termMap));
         } catch (SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
             System.err.println(e);
             return null;
@@ -56,28 +89,54 @@ public abstract class MappingUtils {
             ((CanInitFromAtom) object).init(atom);
             return (T) object;
         }
-        invokeSetters(object,clazz,atom); //will do nothing for constants
+        //annotations
+        invokeSetters(object, clazz, atom);
         return (T) object;
     }
 
-    private static <T> void invokeSetters(Object object, Class<T> clazz, Atom atom) throws Exception {
+    public static <T> T asObject(Class<T> clazz, final Term term) throws Exception {
+        Object object = clazz.newInstance();
+        //direct
+        if (object instanceof CanInitFromTerm) {
+            ((CanInitFromTerm) object).init(term);
+            return (T) object;
+        }
+        //annotations
+        invokeSetters(object, clazz, term);
+        return (T) object;
+    }
+
+    public static String asObject(final Constant constant) throws Exception {
+        return constant.symbol();
+    }
+
+    private static <T> void invokeSetters(Object object, Class<T> clazz, HasArgs input) throws Exception {
         for (Method method : clazz.getMethods()) {
             Arg argAnnotation = method.getAnnotation(Arg.class);
             if (argAnnotation == null) {
                 continue;
             }
             String getterName = method.getName();
+            Class<?> getterReturnType = method.getReturnType();
             int pos = getterName.startsWith("get") ? 3 : 2; //get or is
             String setterName = "set" + getterName.substring(pos);
             int argIdx = argAnnotation.value();
-            Method setterMethod = clazz.getMethod(setterName, String.class);
-            setterMethod.invoke(object, atom.getArg(argIdx));
+            Method setterMethod = clazz.getMethod(setterName, getterReturnType);
+            Term term = input.getArg(argIdx);
+            if (term instanceof Constant) {
+                setterMethod.invoke(object, asObject((Constant) term));
+            } else {
+                setterMethod.invoke(object, asObject(getterReturnType,term));
+            }
         }
     }
 
-    private static String[] asArray(Map<Integer, String> map) {
-        String[] arr = new String[map.size()];
-        for (Map.Entry<Integer, String> entry : map.entrySet()) {
+    private static Term[] asArray(Map<Integer, Term> map) {
+        if (map == null || map.isEmpty()) {
+            return null;
+        }
+        Term[] arr = new Term[map.size()];
+        for (Map.Entry<Integer, Term> entry : map.entrySet()) {
             arr[entry.getKey()] = entry.getValue();
         }
         return arr;

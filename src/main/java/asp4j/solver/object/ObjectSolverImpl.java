@@ -40,7 +40,7 @@ public class ObjectSolverImpl implements ObjectSolver {
     private AnswerSet<Object> filterAndMap(AnswerSet<Atom> answerSet, FilterBinding binding) throws Exception {
         Set<Object> as = new HashSet();
         for (Atom atom : answerSet.atoms()) {
-            if (binding.getFilterPredicateNames().contains(atom.predicateName())) {
+            if (binding.getFilterPredicateNames().contains(atom.symbol())) {
                 as.add(binding.asObject(atom));
             }
         }
@@ -65,7 +65,7 @@ public class ObjectSolverImpl implements ObjectSolver {
     private Set<Object> filterAndMap(Set<Atom> atoms, FilterBinding binding) throws Exception {
         Set<Object> set = new HashSet();
         for (Atom atom : atoms) {
-            if (binding.getFilterPredicateNames().contains(atom.predicateName())) {
+            if (binding.getFilterPredicateNames().contains(atom.symbol())) {
                 set.add(binding.asObject(atom));
             }
         }

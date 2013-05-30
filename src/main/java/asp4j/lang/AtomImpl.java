@@ -1,43 +1,24 @@
 package asp4j.lang;
 
+import java.util.Arrays;
 import java.util.Objects;
 
 /**
  *
- * @author hbeck date May 14, 2013
+ * @author hbeck May 14, 2013
  */
 public class AtomImpl implements Atom {
 
-    private final String predicateName;
-    private final String[] args;
+    private final String predicateSymbol;
+    private final Term[] args;
 
-    public AtomImpl(String predicateName, String... args) {
-        this.predicateName = predicateName;
-        if (args == null) {
+    public AtomImpl(String predicateSymbol, Term... args) {
+        this.predicateSymbol = predicateSymbol;
+        if (args == null || args.length == 0) {
             this.args = null;
         } else {
             this.args = args;
         }
-    }
-
-    public static Atom parse(String atomString) {
-        String s = atomString.trim();
-        if (s.endsWith(".")) {
-            s = s.substring(0, s.length() - 1);
-        }
-        int parenIdx = s.indexOf("(");
-        if (parenIdx == -1) { //constant
-            return new AtomImpl(atomString);
-        }
-        String predicateName = s.substring(0, parenIdx);
-        String inner = s.substring(parenIdx + 1, s.length() - 1);
-        String[] args = inner.split(",");
-        for (String arg : args) {
-            if (arg.contains("(")) {
-                throw new UnsupportedOperationException("function symbols not supported");
-            }
-        }
-        return new AtomImpl(predicateName, args);
     }
 
     @Override
@@ -49,7 +30,7 @@ public class AtomImpl implements Atom {
     }
 
     @Override
-    public String getArg(int idx) {
+    public Term getArg(int idx) {
         if (args == null) {
             return null;
         }
@@ -57,18 +38,18 @@ public class AtomImpl implements Atom {
     }
 
     @Override
-    public String predicateName() {
-        return predicateName;
+    public String symbol() {
+        return predicateSymbol;
     }
 
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append(predicateName());
-        if (args != null) {
-            sb.append("(").append(args[0]);
+        sb.append(symbol());
+        if (args != null && args.length > 0) {
+            sb.append("(").append(args[0].toString());
             for (int i = 1; i < args.length; i++) {
-                sb.append(",").append(args[i]);
+                sb.append(",").append(args[i].toString());
             }
             sb.append(")");
         }
@@ -79,10 +60,8 @@ public class AtomImpl implements Atom {
     @Override
     public int hashCode() {
         int hash = 3;
-        hash = 59 * hash + Objects.hashCode(this.predicateName);
-        for (int i = 0; i < args.length; i++) {
-            hash = 59 * hash + Objects.hash(args[i]);
-        }
+        hash = 59 * hash + Objects.hashCode(this.predicateSymbol);
+        hash = 53 * hash + Arrays.deepHashCode(this.args);
         return hash;
     }
 
@@ -91,25 +70,19 @@ public class AtomImpl implements Atom {
         if (obj == null) {
             return false;
         }
-        if (getClass() != obj.getClass()) {
+        if (!(obj instanceof Atom)) {
             return false;
         }
-        final AtomImpl other = (AtomImpl) obj;
-        if (!Objects.equals(this.predicateName, other.predicateName)) {
+        final Atom other = (Atom) obj;
+        if (!Objects.equals(this.symbol(), other.symbol())) {
             return false;
         }
-        if (this.args == null) {
-            if (other.args != null) {
+        if (this.arity()!=other.arity()) {
+            return false;
+        }
+        for (int i=0; i<this.args.length; i++) {
+            if (!this.getArg(i).equals(other.getArg(i))) {
                 return false;
-            }
-        } else {
-            if (other.args == null) {
-                return false;
-            }            
-            for (int i = 0; i < args.length; i++) {
-                if (!Objects.equals(this.args[i], other.args[i])) {
-                    return false;
-                }
             }
         }
         return true;

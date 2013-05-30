@@ -4,11 +4,13 @@ import asp4j.lang.AnswerSet;
 import asp4j.lang.AnswerSetImpl;
 import asp4j.lang.Atom;
 import asp4j.lang.AtomImpl;
+import asp4j.mapping.ParseUtils;
 import asp4j.program.Program;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -19,7 +21,7 @@ import java.util.Set;
 
 /**
  *
- * @author hbeck date Apr 14, 2013
+ * @author hbeck Apr 14, 2013
  */
 public abstract class SolverBase implements Solver {
 
@@ -40,8 +42,7 @@ public abstract class SolverBase implements Solver {
     protected abstract String solverCommand();
 
     /**
-     * @return list of strings, each representing an answer set. atoms
-     * comma-separated. {optionally, surrounded, by, braces}
+     * @return list of strings, each representing an answer set
      */
     protected abstract List<String> getAnswerSetStrings(Process exec) throws IOException;
 
@@ -84,21 +85,14 @@ public abstract class SolverBase implements Solver {
      * maps a list of answer sets, represented as strings, to a list of (low
      * level) AnswerSet objects
      */
-    protected List<AnswerSet<Atom>> mapAnswerSetStrings(List<String> answerSetStrings) {
+    protected List<AnswerSet<Atom>> mapAnswerSetStrings(List<String> answerSetStrings) throws ParseException {
         List<AnswerSet<Atom>> answerSets = new ArrayList();
         for (String answerSetString : answerSetStrings) {
             answerSetString = prepareAnswerSetString(answerSetString);
             String[] atomStrings = answerSetString.split(atomDelimiter());
             Set<Atom> atoms = new HashSet();
             for (String atomString : atomStrings) {
-                int idxParen = atomString.indexOf("(");
-                if (idxParen == -1) {
-                    atoms.add(new AtomImpl(atomString));
-                } else {
-                    String predicateName = atomString.substring(0, idxParen);
-                    String[] args = atomString.substring(idxParen + 1, atomString.length() - 1).split(",");
-                    atoms.add(new AtomImpl(predicateName, args));
-                }
+                atoms.add(ParseUtils.parseAtom(atomString));
             }
             answerSets.add(new AnswerSetImpl(atoms));
         }
