@@ -1,3 +1,5 @@
+0.0.4
+
 0.0.3 2013-06-02
 
 - separated binding and filter

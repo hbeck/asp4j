@@ -62,11 +62,6 @@ public class Binding {
 
     }
 
-    @Deprecated
-    public Binding addFilter(Class<?> cls) {
-        return this;
-    }
-
     public <T> Binding add(final T t) throws Exception {
         return add((Class<T>) t.getClass(), t);
     }
