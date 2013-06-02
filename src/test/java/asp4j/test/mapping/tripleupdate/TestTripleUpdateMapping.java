@@ -80,14 +80,14 @@ public class TestTripleUpdateMapping {
         assertEquals(3, atoms.size());
         assertTrue(atoms.contains(new Addition(blue_colorOf_car)));
 
-        Set<Object> cautiousConsequence = solver.getConsequence(program, binding, ReasoningMode.CAUTIOUS);
-        Set<Object> braveConsequence = solver.getConsequence(program, binding, ReasoningMode.BRAVE);
+        Set<Object> cautiousConsequence = solver.getConsequence(program, ReasoningMode.CAUTIOUS, binding);
+        Set<Object> braveConsequence = solver.getConsequence(program, ReasoningMode.BRAVE, binding);
         assertTrue(CollectionUtils.isEqualCollection(cautiousConsequence, braveConsequence));
         
         Filter filter = new Filter(Addition.class);
         
-        cautiousConsequence = solver.getConsequence(program, binding, ReasoningMode.CAUTIOUS, filter);
-        braveConsequence = solver.getConsequence(program, binding, ReasoningMode.BRAVE, filter);
+        cautiousConsequence = solver.getConsequence(program, ReasoningMode.CAUTIOUS, binding, filter);
+        braveConsequence = solver.getConsequence(program, ReasoningMode.BRAVE, binding, filter);
         assertTrue(CollectionUtils.isEqualCollection(cautiousConsequence, braveConsequence));
 
 
@@ -133,8 +133,8 @@ public class TestTripleUpdateMapping {
         
         Filter filter = new Filter(Conflict.class);
 
-        Set<Object> cautiousConsequence = solver.getConsequence(program, binding, ReasoningMode.CAUTIOUS, filter);
-        Set<Object> braveConsequence = solver.getConsequence(program, binding, ReasoningMode.BRAVE, filter);
+        Set<Object> cautiousConsequence = solver.getConsequence(program, ReasoningMode.CAUTIOUS, binding, filter);
+        Set<Object> braveConsequence = solver.getConsequence(program, ReasoningMode.BRAVE, binding, filter);
         assertTrue(CollectionUtils.isEqualCollection(cautiousConsequence, braveConsequence));
 
         Conflict expected = new Conflict();
@@ -150,8 +150,7 @@ public class TestTripleUpdateMapping {
 
         //
         binding.add(new SomeConflictMapping());
-        
-        Set<Object> cons = solver.getConsequence(program, binding, ReasoningMode.CAUTIOUS, new Filter(SomeConflict.class));
+        Set<Object> cons = solver.getConsequence(program, ReasoningMode.CAUTIOUS, binding, new Filter(SomeConflict.class));
         assertEquals(1, cons.size());
         assertEquals(new SomeConflict(), (SomeConflict) cons.iterator().next());
     }

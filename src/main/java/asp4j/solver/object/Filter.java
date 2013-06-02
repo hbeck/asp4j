@@ -44,7 +44,7 @@ public class Filter {
      * @param clazz
      * @return
      */
-    public boolean accept(Class<?> clazz) {
+    public boolean accepts(Class<?> clazz) {
         if (clazz==null) {
             return false;
         }

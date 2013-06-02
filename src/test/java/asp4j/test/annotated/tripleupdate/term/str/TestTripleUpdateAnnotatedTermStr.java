@@ -71,8 +71,8 @@ public class TestTripleUpdateAnnotatedTermStr {
         assertEquals(1, as.size());
         assertTrue(as.get(0).atoms().contains(new Addition(blue_colorOf_car)));
 
-        Set<Object> cautiousConsequence = solver.getConsequence(program, binding, ReasoningMode.CAUTIOUS);
-        Set<Object> braveConsequence = solver.getConsequence(program, binding, ReasoningMode.BRAVE);
+        Set<Object> cautiousConsequence = solver.getConsequence(program, ReasoningMode.CAUTIOUS, binding);
+        Set<Object> braveConsequence = solver.getConsequence(program, ReasoningMode.BRAVE, binding);
         assertTrue(CollectionUtils.isEqualCollection(cautiousConsequence, braveConsequence));
 
     }
@@ -109,8 +109,8 @@ public class TestTripleUpdateAnnotatedTermStr {
 
         Binding binding = new Binding().addFilter(Conflict.class);
 
-        Set<Object> cautiousConsequence = solver.getConsequence(program, binding, ReasoningMode.CAUTIOUS);
-        Set<Object> braveConsequence = solver.getConsequence(program, binding, ReasoningMode.BRAVE);
+        Set<Object> cautiousConsequence = solver.getConsequence(program, ReasoningMode.CAUTIOUS, binding);
+        Set<Object> braveConsequence = solver.getConsequence(program, ReasoningMode.BRAVE, binding);
         assertTrue(CollectionUtils.isEqualCollection(cautiousConsequence, braveConsequence));
 
         Conflict expected = new Conflict();
@@ -126,7 +126,7 @@ public class TestTripleUpdateAnnotatedTermStr {
         
         //
         binding = new Binding().addFilter(SomeConflict.class);
-        Set<Object> cons = solver.getConsequence(program, binding, ReasoningMode.CAUTIOUS);
+        Set<Object> cons = solver.getConsequence(program, ReasoningMode.CAUTIOUS, binding);
         assertEquals(1, cons.size());
         assertEquals(new SomeConflict(),(SomeConflict)cons.iterator().next());
     }

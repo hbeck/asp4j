@@ -74,11 +74,11 @@ public class TestPersonAnnotated {
         // ==> answerSets.size() == 2
         assertEquals(2, answerSets.size());
 
-        Set<Object> cautiousConsequence = solver.getConsequence(program, binding, ReasoningMode.CAUTIOUS);
+        Set<Object> cautiousConsequence = solver.getConsequence(program, ReasoningMode.CAUTIOUS, binding);
         // ==> cautiousConsequence.isEmpty()
         assertTrue(cautiousConsequence.isEmpty());
 
-        Set<Object> braveConsequence = solver.getConsequence(program, binding, ReasoningMode.BRAVE);
+        Set<Object> braveConsequence = solver.getConsequence(program, ReasoningMode.BRAVE, binding);
         // ==> braveConsequence.size() == 2
         // ==> braveConsequence.contains(new Female("id42"))
         // ==> braveConsequence.contains(new Male("id42"))
@@ -88,14 +88,14 @@ public class TestPersonAnnotated {
 
         binding.addFilter(Person.class);
 
-        cautiousConsequence = solver.getConsequence(program, binding, ReasoningMode.CAUTIOUS);
+        cautiousConsequence = solver.getConsequence(program, ReasoningMode.CAUTIOUS, binding);
         // ==> cautiousConsequence.size() == 1
         // ==> cautiousConsequence.contains(person)
 
         assertEquals(1, cautiousConsequence.size());
         assertTrue(cautiousConsequence.contains(person));
 
-        braveConsequence = solver.getConsequence(program, binding, ReasoningMode.BRAVE);
+        braveConsequence = solver.getConsequence(program, ReasoningMode.BRAVE, binding);
         assertTrue(braveConsequence.contains(new Female("id42")));
         assertTrue(braveConsequence.contains(new Male("id42")));
 
