@@ -3,8 +3,16 @@ package asp4j.solver.object;
 import asp4j.lang.AnswerSet;
 import asp4j.lang.AnswerSetImpl;
 import asp4j.lang.Atom;
+import asp4j.lang.AtomImpl;
 import asp4j.lang.Constant;
+import asp4j.lang.ConstantImpl;
+import asp4j.lang.HasArgs;
 import asp4j.lang.Term;
+import asp4j.lang.TermImpl;
+import asp4j.mapping.annotations.Arg;
+import asp4j.mapping.annotations.DefAtom;
+import asp4j.mapping.annotations.DefConstant;
+import asp4j.mapping.annotations.DefTerm;
 import asp4j.mapping.direct.CanAsAtom;
 import asp4j.mapping.direct.CanAsConstant;
 import asp4j.mapping.direct.CanAsTerm;
@@ -16,18 +24,25 @@ import asp4j.mapping.object.OutputMapping;
 import asp4j.mapping.object.atom.AnyAtomMapping;
 import asp4j.mapping.object.atom.AtomInputMapping;
 import asp4j.mapping.object.atom.AtomInputMappingBase;
+import asp4j.mapping.object.atom.AtomMapping;
+import asp4j.mapping.object.atom.AtomMappingBase;
 import asp4j.mapping.object.atom.AtomOutputMapping;
 import asp4j.mapping.object.atom.AtomOutputMappingBase;
 import asp4j.mapping.object.constant.AnyConstantMapping;
 import asp4j.mapping.object.constant.ConstantInputMapping;
 import asp4j.mapping.object.constant.ConstantInputMappingBase;
+import asp4j.mapping.object.constant.ConstantMapping;
+import asp4j.mapping.object.constant.ConstantMappingBase;
 import asp4j.mapping.object.constant.ConstantOutputMapping;
 import asp4j.mapping.object.constant.ConstantOutputMappingBase;
 import asp4j.mapping.object.term.AnyTermMapping;
 import asp4j.mapping.object.term.TermInputMapping;
 import asp4j.mapping.object.term.TermInputMappingBase;
+import asp4j.mapping.object.term.TermMapping;
+import asp4j.mapping.object.term.TermMappingBase;
 import asp4j.mapping.object.term.TermOutputMapping;
 import asp4j.mapping.object.term.TermOutputMappingBase;
+import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -66,29 +81,48 @@ public class Binding {
             return this;
         }
 
+        if (clazz.isAnnotationPresent(DefAtom.class)) {
+            AtomMapping<?> mapping = createAtomMappingByAnnotation(clazz);
+            registry.addAtomInputMapping(mapping);
+            registry.addAtomOutputMapping(mapping);
+        } else if (clazz.isAnnotationPresent(DefTerm.class)) {
+            TermMapping<?> mapping = createTermMappingByAnnotation(clazz);
+            registry.addTermInputMapping(mapping);
+            registry.addTermOutputMapping(mapping);
+        } else if (clazz.isAnnotationPresent(DefConstant.class)) {
+            ConstantMapping<?> mapping = createConstantMappingByAnnotation(clazz);
+            registry.addConstantInputMapping(mapping);
+            registry.addConstantOutputMapping(mapping);
+        } else {
+            return tryAddByInterfaces(clazz, inst);
+        }
+
+        return this;
+    }
+
+    private <T> Binding tryAddByInterfaces(final Class<T> clazz, T inst) throws Exception {
+
         if (inst instanceof CanAsAtom) {
-            AtomInputMapping<?> mapping = createCanAsAtomMapping((Class<CanAsAtom>) clazz, (CanAsAtom) inst);
+            AtomInputMapping<?> mapping = createAtomInputMappingByInterface((Class<CanAsAtom>) clazz, (CanAsAtom) inst);
             registry.addAtomInputMapping(mapping);
         } else if (inst instanceof CanAsTerm) {
-            TermInputMapping<?> mapping = createCanAsTermMapping((Class<CanAsTerm>) clazz, (CanAsTerm) inst);
+            TermInputMapping<?> mapping = createTermInputMappingByInterface((Class<CanAsTerm>) clazz, (CanAsTerm) inst);
             registry.addTermInputMapping(mapping);
         } else if (inst instanceof CanAsConstant) {
-            ConstantInputMapping<?> mapping = createCanAsConstantMapping((Class<CanAsConstant>) clazz);
+            ConstantInputMapping<?> mapping = createConstantInputMappingByInterface((Class<CanAsConstant>) clazz);
             registry.addConstantInputMapping(mapping);
         }
-        //TODO annotations
 
         if (inst instanceof CanInitFromAtom) {
-            AtomOutputMapping<?> mapping = createCanInitFromAtomMapping((Class<CanInitFromAtom>) clazz, (CanInitFromAtom) inst);
+            AtomOutputMapping<?> mapping = createAtomOutputMappingByInterface((Class<CanInitFromAtom>) clazz, (CanInitFromAtom) inst);
             registry.addAtomOutputMapping(mapping);
         } else if (inst instanceof CanInitFromTerm) {
-            TermOutputMapping<?> mapping = createCanInitFromTermMapping((Class<CanInitFromTerm>) clazz, (CanInitFromTerm) inst);
+            TermOutputMapping<?> mapping = createTermOutputMappingByInterface((Class<CanInitFromTerm>) clazz, (CanInitFromTerm) inst);
             registry.addTermOutputMapping(mapping);
         } else if (inst instanceof CanInitFromConstant) {
-            ConstantOutputMapping<?> mapping = createCanInitFromConstantMapping((Class<CanInitFromConstant>) clazz);
+            ConstantOutputMapping<?> mapping = createConstantOutputMappingByInterface((Class<CanInitFromConstant>) clazz);
             registry.addConstantOutputMapping(mapping);
         }
-        //TODO annotations
 
         return this;
     }
@@ -96,45 +130,52 @@ public class Binding {
     private <T> void addOutputClass(final Class<T> clazz) throws Exception {
         T inst = clazz.newInstance();
         if (inst instanceof CanInitFromAtom) {
-            AtomOutputMapping<?> mapping = createCanInitFromAtomMapping((Class<CanInitFromAtom>) clazz, (CanInitFromAtom) inst);
+            AtomOutputMapping<?> mapping = createAtomOutputMappingByInterface((Class<CanInitFromAtom>) clazz, (CanInitFromAtom) inst);
             registry.addAtomOutputMapping(mapping);
             return;
         }
-        //TODO annotations
-        throw new Exception("cannot create atom output mapping for " + clazz);
+        AtomMapping<?> mapping = createAtomMappingByAnnotation(clazz);
+        registry.addAtomInputMapping(mapping);
+        registry.addAtomOutputMapping(mapping);
     }
 
     private <T> AtomOutputMapping<T> createAtomOutputMapping(Class<T> clazz) throws Exception {
         T inst = clazz.newInstance();
         if (inst instanceof CanInitFromAtom) {
-            AtomOutputMapping<?> mapping = createCanInitFromAtomMapping((Class<CanInitFromAtom>) clazz, (CanInitFromAtom) inst);
+            AtomOutputMapping<?> mapping = createAtomOutputMappingByInterface((Class<CanInitFromAtom>) clazz, (CanInitFromAtom) inst);
             registry.addAtomOutputMapping(mapping);
             return (AtomOutputMapping<T>) mapping;
         }
-        //TODO annotations
-        throw new Exception("cannot create atom output mapping for" + clazz);
+        AtomMapping<?> mapping = createAtomMappingByAnnotation(clazz);
+        registry.addAtomInputMapping(mapping);
+        registry.addAtomOutputMapping(mapping);
+        return (AtomOutputMapping<T>) mapping;
     }
 
     private <T> TermOutputMapping<T> createTermOutputMapping(Class<T> clazz) throws Exception {
         T inst = clazz.newInstance();
         if (inst instanceof CanInitFromTerm) {
-            TermOutputMapping<?> mapping = createCanInitFromTermMapping((Class<CanInitFromTerm>) clazz, (CanInitFromTerm) inst);
+            TermOutputMapping<?> mapping = createTermOutputMappingByInterface((Class<CanInitFromTerm>) clazz, (CanInitFromTerm) inst);
             registry.addTermOutputMapping(mapping);
             return (TermOutputMapping<T>) mapping;
         }
-        //TODO annotations
-        throw new Exception("cannot create term output mapping for " + clazz);
+        TermMapping<?> mapping = createTermMappingByAnnotation(clazz);
+        registry.addTermInputMapping(mapping);
+        registry.addTermOutputMapping(mapping);
+        return (TermOutputMapping<T>) mapping;
     }
 
     private <T> ConstantOutputMapping<T> createConstantOutputMapping(Class<T> clazz) throws Exception {
         T inst = clazz.newInstance();
         if (inst instanceof CanInitFromConstant) {
-            ConstantOutputMapping<?> mapping = createCanInitFromConstantMapping((Class<CanInitFromConstant>) clazz);
+            ConstantOutputMapping<?> mapping = createConstantOutputMappingByInterface((Class<CanInitFromConstant>) clazz);
             registry.addConstantOutputMapping(mapping);
             return (ConstantOutputMapping<T>) mapping;
         }
-        //TODO annotations
-        throw new Exception("cannot create constant output mapping for " + clazz);
+        ConstantMapping<?> mapping = createConstantMappingByAnnotation(clazz);
+        registry.addConstantInputMapping(mapping);
+        registry.addConstantOutputMapping(mapping);
+        return (ConstantOutputMapping<T>) mapping;
     }
 
     public <T> Binding add(AnyAtomMapping<T> mapping) throws Exception {
@@ -173,8 +214,19 @@ public class Binding {
     }
 
     public <T> Term asTerm(T t) throws Exception {
-        TermInputMapping<T> mapping = (TermInputMapping<T>) registry.getTermInputMapping(t.getClass());
-        return mapping.asLangElem(t);
+        TermInputMapping<? extends Object> termInputMapping = registry.getTermInputMapping(t.getClass());
+        if (termInputMapping != null) {
+            TermInputMapping<T> mapping = (TermInputMapping<T>) termInputMapping;
+            return mapping.asLangElem(t);
+        }
+        try {
+            add((Class<T>)t.getClass(), t);
+            TermInputMapping<T> mapping = (TermInputMapping<T>)registry.getTermInputMapping(t.getClass());
+            return mapping.asLangElem(t);
+        } catch (Exception e) {
+            //TODO
+        }
+        return asConstant(t);
     }
 
     public <T> Constant asConstant(T t) throws Exception {
@@ -248,7 +300,137 @@ public class Binding {
         return Collections.unmodifiableSet(set);
     }
 
-    private <T extends CanAsAtom> AtomInputMapping<T> createCanAsAtomMapping(final Class<T> clazz, final CanAsAtom template) throws Exception {
+    //
+    private <T> AtomMapping<T> createAtomMappingByAnnotation(final Class<T> clazz) throws Exception {
+        DefAtom atomAnn = clazz.getAnnotation(DefAtom.class);
+        final String predicateSymbol = atomAnn.value();
+        return new AtomMappingBase<T>() {
+            @Override
+            public Class<T> clazz() {
+                return clazz;
+            }
+
+            @Override
+            public String symbol() {
+                return predicateSymbol;
+            }
+
+            @Override
+            public Atom asLangElem(T t) throws Exception {
+                Map<Integer, Term> termMap = new HashMap<>();
+                for (Method method : clazz.getMethods()) {
+                    Arg argAnnotation = method.getAnnotation(Arg.class);
+                    if (argAnnotation == null) {
+                        continue;
+                    }
+                    int arg = argAnnotation.value();
+                    Object returnedObject = method.invoke(t);
+                    termMap.put(Integer.valueOf(arg), asTerm(returnedObject));
+                }
+                return new AtomImpl(predicateSymbol, asArray(termMap));
+            }
+
+            @Override
+            public T asObject(Atom atom) throws Exception {
+                Object object = clazz().newInstance();
+                invokeSetters(object, clazz, atom);
+                return (T) object;
+            }
+        };
+    }
+
+    private <T> TermMapping<T> createTermMappingByAnnotation(final Class<T> clazz) throws Exception {
+        return new TermMappingBase<T>() {
+            @Override
+            public Class<T> clazz() {
+                return clazz;
+            }
+
+            @Override
+            public String symbol() {
+                DefTerm termAnn = clazz.getAnnotation(DefTerm.class);
+                return termAnn.value();
+            }
+
+            @Override
+            public Term asLangElem(T t) throws Exception {
+                Map<Integer, Term> termMap = new HashMap<>();
+                for (Method method : clazz.getMethods()) {
+                    Arg argAnnotation = method.getAnnotation(Arg.class);
+                    if (argAnnotation == null) {
+                        continue;
+                    }
+                    int arg = argAnnotation.value();
+                    Object returnedObject = method.invoke(t);
+                    termMap.put(Integer.valueOf(arg), asTerm(returnedObject));
+                }
+                return new TermImpl(symbol(), asArray(termMap));
+            }
+
+            @Override
+            public T asObject(Term term) throws Exception {
+                Object object = clazz().newInstance();
+                invokeSetters(object, clazz, term);
+                return (T) object;
+            }
+        };
+    }
+
+    private <T> ConstantMapping<T> createConstantMappingByAnnotation(final Class<T> clazz) throws Exception {
+        return new ConstantMappingBase<T>() {
+            @Override
+            public Class<T> clazz() {
+                return clazz;
+            }
+
+            @Override
+            public Constant asLangElem(T t) throws Exception {
+                DefConstant constAnn = clazz().getAnnotation(DefConstant.class);
+                String symbol = constAnn.value();
+                return new ConstantImpl(symbol);
+            }
+
+            @Override
+            public T asObject(Constant constant) throws Exception {
+                return clazz.newInstance();
+            }
+        };
+    }
+
+    private <T> void invokeSetters(Object object, Class<T> clazz, HasArgs input) throws Exception {
+        for (Method method : clazz.getMethods()) {
+            Arg argAnnotation = method.getAnnotation(Arg.class);
+            if (argAnnotation == null) {
+                continue;
+            }
+            String getterName = method.getName();
+            Class<?> type = method.getReturnType();
+            int pos = getterName.startsWith("get") ? 3 : 2; //get or is
+            String setterName = "set" + getterName.substring(pos);
+            int argIdx = argAnnotation.value();
+            Method setterMethod = clazz.getMethod(setterName, type);
+            Term term = input.getArg(argIdx);
+            if (term instanceof Constant) {
+                setterMethod.invoke(object, constantAsObject((Constant) term, type));
+            } else {
+                setterMethod.invoke(object, termAsObject(term, type));
+            }
+        }
+    }
+
+    private Term[] asArray(Map<Integer, Term> map) {
+        if (map == null || map.isEmpty()) {
+            return null;
+        }
+        Term[] arr = new Term[map.size()];
+        for (Map.Entry<Integer, Term> entry : map.entrySet()) {
+            arr[entry.getKey()] = entry.getValue();
+        }
+        return arr;
+    }
+
+    //
+    private <T extends CanAsAtom> AtomInputMapping<T> createAtomInputMappingByInterface(final Class<T> clazz, final CanAsAtom template) throws Exception {
         return new AtomInputMappingBase<T>() {
             private final String symbol = template.symbol();
 
@@ -269,7 +451,7 @@ public class Binding {
         };
     }
 
-    private <T extends CanAsTerm> TermInputMapping<T> createCanAsTermMapping(final Class<T> clazz, final CanAsTerm template) throws Exception {
+    private <T extends CanAsTerm> TermInputMapping<T> createTermInputMappingByInterface(final Class<T> clazz, final CanAsTerm template) throws Exception {
         return new TermInputMappingBase<T>() {
             private final String symbol = template.symbol();
 
@@ -290,7 +472,7 @@ public class Binding {
         };
     }
 
-    private <T extends CanAsConstant> ConstantInputMapping<T> createCanAsConstantMapping(final Class<T> clazz) throws Exception {
+    private <T extends CanAsConstant> ConstantInputMapping<T> createConstantInputMappingByInterface(final Class<T> clazz) throws Exception {
         return new ConstantInputMappingBase<T>() {
             @Override
             public Class<T> clazz() {
@@ -304,7 +486,7 @@ public class Binding {
         };
     }
 
-    private <T extends CanInitFromAtom> AtomOutputMapping<T> createCanInitFromAtomMapping(final Class<T> clazz, final CanInitFromAtom template) throws Exception {
+    private <T extends CanInitFromAtom> AtomOutputMapping<T> createAtomOutputMappingByInterface(final Class<T> clazz, final CanInitFromAtom template) throws Exception {
         return new AtomOutputMappingBase<T>() {
             private final String symbol = template.symbol();
 
@@ -327,7 +509,7 @@ public class Binding {
         };
     }
 
-    private <T extends CanInitFromTerm> TermOutputMapping<T> createCanInitFromTermMapping(final Class<T> clazz, final CanInitFromTerm template) throws Exception {
+    private <T extends CanInitFromTerm> TermOutputMapping<T> createTermOutputMappingByInterface(final Class<T> clazz, final CanInitFromTerm template) throws Exception {
         return new TermOutputMappingBase<T>() {
             private final String symbol = template.symbol();
 
@@ -350,7 +532,7 @@ public class Binding {
         };
     }
 
-    private <T extends CanInitFromConstant> ConstantOutputMapping<T> createCanInitFromConstantMapping(final Class<T> clazz) throws Exception {
+    private <T extends CanInitFromConstant> ConstantOutputMapping<T> createConstantOutputMappingByInterface(final Class<T> clazz) throws Exception {
         return new ConstantOutputMappingBase<T>() {
             @Override
             public Class<T> clazz() {
@@ -366,12 +548,14 @@ public class Binding {
         };
     }
 
+    //
     private class Registry {
 
         private final Binding binding;
 
         Registry(Binding binding) {
             this.binding = binding;
+            init();
         }
         private Map<String, Class<?>> predicateSymbol2class = new HashMap<>();
         private Map<String, Class<?>> functionSymbol2class = new HashMap<>();
@@ -383,6 +567,27 @@ public class Binding {
         private Map<Class<?>, AtomOutputMapping<?>> atomOutputMappings = new HashMap<>();
         private Map<Class<?>, TermOutputMapping<?>> termOutputMappings = new HashMap<>();
         private Map<Class<?>, ConstantOutputMapping<?>> constantOutputMappings = new HashMap<>();
+
+        private void init() {
+            ConstantMapping<String> cm = new ConstantMappingBase<String>() {
+                @Override
+                public Class<String> clazz() {
+                    return String.class;
+                }
+
+                @Override
+                public Constant asLangElem(String s) throws Exception {
+                    return new ConstantImpl(s);
+                }
+
+                @Override
+                public String asObject(Constant constant) throws Exception {
+                    return constant.symbol();
+                }
+            };
+            addConstantInputMapping(cm);
+            addConstantOutputMapping(cm);
+        }
 
         private boolean isRegistered(Class<?> clazz) {
             return isRegisteredInput(clazz) || isRegisteredOutput(clazz);
@@ -459,7 +664,7 @@ public class Binding {
                     return (TermInputMapping<T>) mapping;
                 }
             }
-            throw new Exception("no term input mapping found for class " + clazz + ". could not map instance.");
+            return null; //try load/constant input mapping above. TODO
         }
 
         private <T> ConstantInputMapping<T> getConstantInputMapping(Class<T> clazz) throws Exception {
@@ -473,7 +678,7 @@ public class Binding {
                     return (ConstantInputMapping<T>) mapping;
                 }
             }
-            throw new Exception("no constant input mapping found for class " + clazz + ". could not map instance.");
+            return null; //try load TODO
         }
 
         private <T> AtomOutputMapping<T> getAtomOutputMapping(Class<T> clazz) throws Exception {

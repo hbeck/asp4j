@@ -118,7 +118,6 @@ public class TestTripleUpdateMapping {
                 .add(new File(rulefile))
                 .add(new InDatabase(hasColor_inverseOf_colorOf))
                 .add(new InDatabase(hasColor_type_single))
-                .add(new InDatabase(car_hasColor_blue))
                 .add(new InDatabase(blue_colorOf_car))
                 .add(new Addition(red_colorOf_car))
                 .build();

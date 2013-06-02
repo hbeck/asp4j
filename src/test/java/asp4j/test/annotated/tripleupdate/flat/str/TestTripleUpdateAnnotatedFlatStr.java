@@ -8,6 +8,7 @@ import asp4j.solver.Solver;
 import asp4j.solver.SolverClingo;
 import asp4j.solver.SolverDLV;
 import asp4j.solver.object.Binding;
+import asp4j.solver.object.Filter;
 import asp4j.solver.object.ObjectSolver;
 import asp4j.solver.object.ObjectSolverImpl;
 import java.io.File;
@@ -64,15 +65,13 @@ public class TestTripleUpdateAnnotatedFlatStr {
                 .add(new Addition(hasColor_inverseOf_colorOf))
                 .build();
 
-        Binding binding = new Binding().addFilter(Addition.class);
- 
-        List<AnswerSet<Object>> as = solver.getAnswerSets(program, binding);
+        List<AnswerSet<Object>> as = solver.getAnswerSets(program);
 
         assertEquals(1, as.size());
         assertTrue(as.get(0).atoms().contains(new Addition(blue_colorOf_car)));
 
-        Set<Object> cautiousConsequence = solver.getConsequence(program, ReasoningMode.CAUTIOUS, binding);
-        Set<Object> braveConsequence = solver.getConsequence(program, ReasoningMode.BRAVE, binding);
+        Set<Object> cautiousConsequence = solver.getConsequence(program, ReasoningMode.CAUTIOUS);
+        Set<Object> braveConsequence = solver.getConsequence(program, ReasoningMode.BRAVE);
         assertTrue(CollectionUtils.isEqualCollection(cautiousConsequence, braveConsequence));
 
     }
@@ -107,10 +106,10 @@ public class TestTripleUpdateAnnotatedFlatStr {
                 .add(new Addition(red_colorOf_car))
                 .build();
 
-        Binding binding = new Binding().addFilter(Conflict.class);
+        Filter filter = new Filter(Conflict.class);
 
-        Set<Object> cautiousConsequence = solver.getConsequence(program, ReasoningMode.CAUTIOUS, binding);
-        Set<Object> braveConsequence = solver.getConsequence(program, ReasoningMode.BRAVE, binding);
+        Set<Object> cautiousConsequence = solver.getConsequence(program, ReasoningMode.CAUTIOUS, filter);
+        Set<Object> braveConsequence = solver.getConsequence(program, ReasoningMode.BRAVE, filter);
         assertTrue(CollectionUtils.isEqualCollection(cautiousConsequence, braveConsequence));
 
         Conflict expected = new Conflict();
@@ -121,14 +120,14 @@ public class TestTripleUpdateAnnotatedFlatStr {
         expected.setObject1("blue");
         expected.setObject2("red");
 
-        List<AnswerSet<Object>> as = solver.getAnswerSets(program, binding);
+        List<AnswerSet<Object>> as = solver.getAnswerSets(program, filter);
         assertTrue(as.get(0).atoms().contains(expected));
         assertEquals(1, as.size());
         assertEquals(1, as.get(0).atoms().size());
         
         //
-        binding = new Binding().addFilter(SomeConflict.class);
-        Set<Object> cons = solver.getConsequence(program, ReasoningMode.CAUTIOUS, binding);
+        filter = new Filter(SomeConflict.class);
+        Set<Object> cons = solver.getConsequence(program, ReasoningMode.CAUTIOUS, filter);
         assertEquals(1, cons.size());
         assertEquals(new SomeConflict(),(SomeConflict)cons.iterator().next());
     }
