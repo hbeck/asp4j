@@ -8,7 +8,7 @@ import java.util.Set;
 
 /**
  *
- * @author hbeck date May 19, 2013
+ * @author hbeck May 19, 2013
  */
 public interface ObjectSolver {
 
@@ -19,7 +19,9 @@ public interface ObjectSolver {
      * @return answer sets
      * @throws Exception
      */
-    List<AnswerSet<Object>> getAnswerSets(Program<?> program, FilterBinding binding) throws Exception;
+    List<AnswerSet<Object>> getAnswerSets(Program<?> program, Binding binding) throws Exception;
+    
+    List<AnswerSet<Object>> getAnswerSets(Program<?> program, Binding binding, Filter filter) throws Exception;
 
      /**
      * derive logical consequence of a program and return the objects of the bound classes
@@ -30,5 +32,17 @@ public interface ObjectSolver {
      * @return logical consequence by means of the answer set semantics, filtered and instatiated due to binding
      * @throws Exception 
      */
-    Set<Object> getConsequence(Program<?> program, FilterBinding binding, ReasoningMode mode) throws Exception;
+    Set<Object> getConsequence(Program<?> program, Binding binding, ReasoningMode mode) throws Exception;
+    
+    /**
+     * 
+     * @param program
+     * @param binding
+     * @param mode
+     * @param filter
+     * @return
+     * @throws Exception 
+     */
+    Set<Object> getConsequence(Program<?> program, Binding binding, ReasoningMode mode, Filter filter) throws Exception;
+    
 }

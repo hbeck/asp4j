@@ -64,7 +64,7 @@ public abstract class ParseUtils {
      */
     protected static List<String> tokenizeTerms(String innerStr) throws ParseException {
         char[] chars = innerStr.toCharArray();
-        List<String> tokens = new ArrayList();
+        List<String> tokens = new ArrayList<>();
         parseStep(chars, 0, tokens, new StringBuilder(), 0);
         return tokens;
     }

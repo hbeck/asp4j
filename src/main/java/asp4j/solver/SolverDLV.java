@@ -24,7 +24,7 @@ public class SolverDLV extends SolverBase {
         if (allLines.isEmpty()) {
             throw new IOException("dlv output error: lines empty");
         }
-        List<String> answerSetLines = new ArrayList();
+        List<String> answerSetLines = new ArrayList<>();
         for (String line : allLines) {
             if (!line.startsWith("{")) {
                 throw new IOException("dlv output error: not an answer set: "+line);

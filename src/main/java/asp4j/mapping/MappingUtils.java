@@ -9,8 +9,10 @@ import asp4j.lang.Term;
 import asp4j.lang.TermImpl;
 import asp4j.mapping.annotations.Arg;
 import asp4j.mapping.annotations.DefAtom;
+import asp4j.mapping.annotations.DefConstant;
 import asp4j.mapping.annotations.DefTerm;
 import asp4j.mapping.direct.CanAsAtom;
+import asp4j.mapping.direct.CanAsConstant;
 import asp4j.mapping.direct.CanAsTerm;
 import asp4j.mapping.direct.CanInitFromAtom;
 import asp4j.mapping.direct.CanInitFromTerm;
@@ -35,7 +37,7 @@ public abstract class MappingUtils {
             Class<?> clazz = object.getClass();
             DefAtom atomAnn = clazz.getAnnotation(DefAtom.class);
             String predicateSymbol = atomAnn.value();
-            Map<Integer, Term> termMap = new HashMap();
+            Map<Integer, Term> termMap = new HashMap<>();
             for (Method method : clazz.getMethods()) {
                 Arg argAnnotation = method.getAnnotation(Arg.class);
                 if (argAnnotation == null) {
@@ -64,8 +66,11 @@ public abstract class MappingUtils {
             //annotation
             Class<?> clazz = object.getClass();
             DefTerm termAnn = clazz.getAnnotation(DefTerm.class);
+            //TODO CURR
+            //mappings are not seen here
+            //solution: get rid of this, incorporate in binding
             String functionSymbol = termAnn.value();
-            Map<Integer, Term> termMap = new HashMap();
+            Map<Integer, Term> termMap = new HashMap<>();
             for (Method method : clazz.getMethods()) {
                 Arg argAnnotation = method.getAnnotation(Arg.class);
                 if (argAnnotation == null) {
@@ -82,7 +87,27 @@ public abstract class MappingUtils {
         }
     }
 
-    public static <T> T asObject(Class<T> clazz, final Atom atom) throws Exception {
+    public static Constant asConstant(final Object object) {
+        try {
+            //direct
+            if (object instanceof CanAsConstant) {
+                return ((CanAsConstant) object).asConstant();
+            }
+            if (object instanceof String) {
+                return new ConstantImpl((String) object);
+            }
+            //annotation
+            Class<?> clazz = object.getClass();
+            DefConstant constAnn = clazz.getAnnotation(DefConstant.class);
+            String constantSymbol = constAnn.value();
+            return new ConstantImpl(constantSymbol);
+        } catch (Exception e) {
+            System.err.println(e);
+            return null;
+        }
+    }
+
+    public static <T> T asObject(final Atom atom, Class<T> clazz) throws Exception {
         Object object = clazz.newInstance();
         //direct
         if (object instanceof CanInitFromAtom) {
@@ -94,7 +119,7 @@ public abstract class MappingUtils {
         return (T) object;
     }
 
-    public static <T> T asObject(Class<T> clazz, final Term term) throws Exception {
+    public static <T> T asObject(final Term term, Class<T> clazz) throws Exception {
         Object object = clazz.newInstance();
         //direct
         if (object instanceof CanInitFromTerm) {
@@ -126,7 +151,7 @@ public abstract class MappingUtils {
             if (term instanceof Constant) {
                 setterMethod.invoke(object, asObject((Constant) term));
             } else {
-                setterMethod.invoke(object, asObject(getterReturnType,term));
+                setterMethod.invoke(object, asObject(term, getterReturnType));
             }
         }
     }
@@ -141,5 +166,4 @@ public abstract class MappingUtils {
         }
         return arr;
     }
-    
 }

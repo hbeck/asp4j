@@ -7,7 +7,7 @@ import asp4j.solver.ReasoningMode;
 import asp4j.solver.Solver;
 import asp4j.solver.SolverClingo;
 import asp4j.solver.SolverDLV;
-import asp4j.solver.object.FilterBinding;
+import asp4j.solver.object.Binding;
 import asp4j.solver.object.ObjectSolver;
 import asp4j.solver.object.ObjectSolverImpl;
 import java.io.File;
@@ -28,7 +28,7 @@ import org.openrdf.model.impl.URIImpl;
  */
 public class TestTripleUpdateAnnotatedTermStr {
 
-    private final String rulefile_common = System.getProperty("user.dir") + "/src/test/common/triple-update-term.lp";
+    private final String rulefile_common = System.getProperty("user.dir") + "/src/test/common/triple-update-term-str.lp";
 
     @Test
     public void test_dlv_common() throws Exception {
@@ -58,13 +58,13 @@ public class TestTripleUpdateAnnotatedTermStr {
 
         ObjectSolver solver = new ObjectSolverImpl(externalSolver); //Solver<Object>
 
-        Program<Object> program = new ProgramBuilder()
+        Program<Object> program = new ProgramBuilder<>()
                 .add(new File(rulefile))
                 .add(new Addition(car_hasColor_blue))
                 .add(new Addition(hasColor_inverseOf_colorOf))
                 .build();
 
-        FilterBinding binding = new FilterBinding().add(Addition.class);
+        Binding binding = new Binding().addFilter(Addition.class);
  
         List<AnswerSet<Object>> as = solver.getAnswerSets(program, binding);
 
@@ -98,7 +98,7 @@ public class TestTripleUpdateAnnotatedTermStr {
 
         ObjectSolver solver = new ObjectSolverImpl(externalSolver);
 
-        Program<Object> program = new ProgramBuilder()
+        Program<Object> program = new ProgramBuilder<>()
                 .add(new File(rulefile))
                 .add(new InDatabase(hasColor_inverseOf_colorOf))
                 .add(new InDatabase(hasColor_type_single))
@@ -107,7 +107,7 @@ public class TestTripleUpdateAnnotatedTermStr {
                 .add(new Addition(red_colorOf_car))
                 .build();
 
-        FilterBinding binding = new FilterBinding().add(Conflict.class);
+        Binding binding = new Binding().addFilter(Conflict.class);
 
         Set<Object> cautiousConsequence = solver.getConsequence(program, binding, ReasoningMode.CAUTIOUS);
         Set<Object> braveConsequence = solver.getConsequence(program, binding, ReasoningMode.BRAVE);
@@ -125,7 +125,7 @@ public class TestTripleUpdateAnnotatedTermStr {
         assertEquals(1, as.get(0).atoms().size());
         
         //
-        binding = new FilterBinding().add(SomeConflict.class);
+        binding = new Binding().addFilter(SomeConflict.class);
         Set<Object> cons = solver.getConsequence(program, binding, ReasoningMode.CAUTIOUS);
         assertEquals(1, cons.size());
         assertEquals(new SomeConflict(),(SomeConflict)cons.iterator().next());

@@ -1,16 +1,13 @@
 package asp4j.solver.object;
 
 import asp4j.lang.AnswerSet;
-import asp4j.lang.AnswerSetImpl;
 import asp4j.lang.Atom;
-import asp4j.mapping.MappingUtils;
 import asp4j.program.Program;
 import asp4j.program.ProgramBuilder;
 import asp4j.solver.ReasoningMode;
 import asp4j.solver.Solver;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -27,48 +24,42 @@ public class ObjectSolverImpl implements ObjectSolver {
     }
 
     @Override
-    public List<AnswerSet<Object>> getAnswerSets(Program<?> program, FilterBinding binding) throws Exception {
-        List<AnswerSet<Atom>> answerSets = solver.getAnswerSets(getLowLevelProgram(program));
-        List<AnswerSet<Object>> list = new ArrayList();
-        for (AnswerSet<Atom> answerSet : answerSets) {
-            list.add(filterAndMap(answerSet, binding));
-        }
-        return Collections.unmodifiableList(list);
+    public List<AnswerSet<Object>> getAnswerSets(Program<?> program, Binding binding) throws Exception {
+        return Collections.unmodifiableList(getAnswerSets(program, binding, null));
     }
 
     @Override
-    public Set<Object> getConsequence(Program<?> program, FilterBinding binding, ReasoningMode mode) throws Exception {
-        Set<Atom> atoms = solver.getConsequence(getLowLevelProgram(program), mode);
-        return filterAndMap(atoms, binding);
+    public List<AnswerSet<Object>> getAnswerSets(Program<?> program, Binding binding, Filter filter) throws Exception {
+        return Collections.unmodifiableList(computeAnswerSets(program, binding, filter));
+    }
+
+    @Override
+    public Set<Object> getConsequence(Program<?> program, Binding binding, ReasoningMode mode) throws Exception {
+        return getConsequence(program,binding,mode,null);
+    }
+
+    @Override
+    public Set<Object> getConsequence(Program<?> program, Binding binding, ReasoningMode mode, Filter filter) throws Exception {
+        Set<Atom> atoms = solver.getConsequence(computeLowLevelProgram(program, binding), mode);
+        return binding.filterAndMap(atoms,filter);
+    }
+
+    private List<AnswerSet<Object>> computeAnswerSets(Program<?> program, Binding binding, Filter filter) throws Exception {
+        List<AnswerSet<Atom>> answerSets = solver.getAnswerSets(computeLowLevelProgram(program, binding));
+        List<AnswerSet<Object>> list = new ArrayList<>();
+        for (AnswerSet<Atom> answerSet : answerSets) {
+            list.add(binding.filterAndMap(answerSet,filter));
+        }
+        return list;
     }
 
     //
-    private AnswerSet<Object> filterAndMap(AnswerSet<Atom> answerSet, FilterBinding binding) throws Exception {
-        Set<Object> as = new HashSet();
-        for (Atom atom : answerSet.atoms()) {
-            if (binding.getFilterPredicateNames().contains(atom.symbol())) {
-                as.add(binding.asObject(atom));
-            }
-        }
-        return new AnswerSetImpl(as);
-    }
-
-    private <T> Program<Atom> getLowLevelProgram(Program<T> program) throws Exception {
-        ProgramBuilder<Atom> builder = new ProgramBuilder();
+    private Program<Atom> computeLowLevelProgram(Program<?> program, Binding binding) throws Exception {
+        ProgramBuilder<Atom> builder = new ProgramBuilder<>();
         builder.addFiles(program.getFiles());
-        for (T input : program.getInput()) {
-            builder.add(MappingUtils.asAtom(input));
+        for (Object input : program.getInput()) {
+            builder.add(binding.asAtom(input));
         }
         return builder.build();
-    }
-
-    private Set<Object> filterAndMap(Set<Atom> atoms, FilterBinding binding) throws Exception {
-        Set<Object> set = new HashSet();
-        for (Atom atom : atoms) {
-            if (binding.getFilterPredicateNames().contains(atom.symbol())) {
-                set.add(binding.asObject(atom));
-            }
-        }
-        return Collections.unmodifiableSet(set);
     }
 }

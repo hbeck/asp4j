@@ -86,15 +86,15 @@ public abstract class SolverBase implements Solver {
      * level) AnswerSet objects
      */
     protected List<AnswerSet<Atom>> mapAnswerSetStrings(List<String> answerSetStrings) throws ParseException {
-        List<AnswerSet<Atom>> answerSets = new ArrayList();
+        List<AnswerSet<Atom>> answerSets = new ArrayList<>();
         for (String answerSetString : answerSetStrings) {
             answerSetString = prepareAnswerSetString(answerSetString);
             String[] atomStrings = answerSetString.split(atomDelimiter());
-            Set<Atom> atoms = new HashSet();
+            Set<Atom> atoms = new HashSet<>();
             for (String atomString : atomStrings) {
                 atoms.add(ParseUtils.parseAtom(atomString));
             }
-            answerSets.add(new AnswerSetImpl(atoms));
+            answerSets.add(new AnswerSetImpl<>(atoms));
         }
         return answerSets;
     }
@@ -113,7 +113,7 @@ public abstract class SolverBase implements Solver {
     }
 
     protected Set<Atom> cautiousConsequence(List<AnswerSet<Atom>> answerSets) {
-        Set<Atom> intersection = new HashSet();
+        Set<Atom> intersection = new HashSet<>();
         Iterator<AnswerSet<Atom>> it = answerSets.iterator();
         if (it.hasNext()) {
             intersection.addAll(it.next().atoms());
@@ -125,7 +125,7 @@ public abstract class SolverBase implements Solver {
     }
 
     protected Set<Atom> braveConsequence(List<AnswerSet<Atom>> answerSets) {
-        Set<Atom> set = new HashSet();
+        Set<Atom> set = new HashSet<>();
         for (AnswerSet<Atom> answerSet : answerSets) {
             set.addAll(answerSet.atoms());
         }

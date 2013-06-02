@@ -103,7 +103,7 @@ public class Triple {
 
     @Override
     public String toString() {
-        return "TypedTriple{" + "subject=" + subject + ", predicate=" + predicate + ", object=" + object + '}';
+        return "Triple{" + "subject=" + subject + ", predicate=" + predicate + ", object=" + object + '}';
     }    
     
 }

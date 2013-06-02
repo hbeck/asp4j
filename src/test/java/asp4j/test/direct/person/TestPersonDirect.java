@@ -6,7 +6,8 @@ import asp4j.solver.ReasoningMode;
 import asp4j.solver.Solver;
 import asp4j.solver.SolverClingo;
 import asp4j.solver.SolverDLV;
-import asp4j.solver.object.FilterBinding;
+import asp4j.solver.object.Binding;
+import asp4j.solver.object.Filter;
 import asp4j.solver.object.ObjectSolver;
 import asp4j.solver.object.ObjectSolverImpl;
 import java.io.File;
@@ -66,25 +67,30 @@ public class TestPersonDirect {
         Female female = new Female(id42);
 
         ObjectSolver objectSolver = new ObjectSolverImpl(externalSolver);
-        Program<Object> program = new ProgramBuilder().add(new File(rulefile)).add(person).build();
-        FilterBinding binding = new FilterBinding().add(Male.class).add(Female.class);
+        Program<Object> program = new ProgramBuilder<>().add(new File(rulefile)).add(person).build();
+        Binding binding = new Binding().add(Male.class).add(Female.class).add(Person.class);
+        
+        Filter filter = new Filter().add(Male.class).add(Female.class);
 
-        Set<Object> cautiousConsequence = objectSolver.getConsequence(program, binding, ReasoningMode.CAUTIOUS);
+        Set<Object> cautiousConsequence = objectSolver.getConsequence(program, binding, ReasoningMode.CAUTIOUS, filter);
         assertTrue(cautiousConsequence.isEmpty());
         
-        Set<Object> braveConsequence = objectSolver.getConsequence(program, binding, ReasoningMode.BRAVE);
+        Set<Object> braveConsequence = objectSolver.getConsequence(program, binding, ReasoningMode.BRAVE, filter);
         assertEquals(2, braveConsequence.size());
         assertTrue(braveConsequence.contains(male));
         assertTrue(braveConsequence.contains(female));
 
-        binding.add(Person.class);
+        filter.add(Person.class);
 
-        cautiousConsequence = objectSolver.getConsequence(program, binding, ReasoningMode.CAUTIOUS);
+        cautiousConsequence = objectSolver.getConsequence(program, binding, ReasoningMode.CAUTIOUS, filter);
         assertTrue(cautiousConsequence.contains(person));
+        assertEquals(1,cautiousConsequence.size());
         
-        braveConsequence = objectSolver.getConsequence(program, binding, ReasoningMode.BRAVE);
+        braveConsequence = objectSolver.getConsequence(program, binding, ReasoningMode.BRAVE, filter);
+        assertTrue(braveConsequence.contains(person));
         assertTrue(braveConsequence.contains(male));
         assertTrue(braveConsequence.contains(female));
+        assertEquals(3,braveConsequence.size());
 
     }
 }

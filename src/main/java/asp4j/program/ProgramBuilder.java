@@ -17,13 +17,13 @@ public class ProgramBuilder<T> {
     private Set<File> files;
 
     public ProgramBuilder() {
-        this.input = new HashSet();
-        this.files = new HashSet();
+        this.input = new HashSet<>();
+        this.files = new HashSet<>();
     }
     
     public ProgramBuilder(Program<T> program) {
-        this.input = new HashSet(program.getInput());
-        this.files = new HashSet(program.getFiles());
+        this.input = new HashSet<>(program.getInput());
+        this.files = new HashSet<>(program.getFiles());
     }
 
     public Program<T> build() {

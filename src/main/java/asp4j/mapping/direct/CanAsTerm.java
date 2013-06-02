@@ -1,5 +1,6 @@
 package asp4j.mapping.direct;
 
+import asp4j.lang.HasSymbol;
 import asp4j.lang.Term;
 
 /**
@@ -7,7 +8,7 @@ import asp4j.lang.Term;
  *
  * @author hbeck May 30, 2013
  */
-public interface CanAsTerm {
+public interface CanAsTerm extends HasSymbol {
     
     Term asTerm();
     

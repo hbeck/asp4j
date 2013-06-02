@@ -21,7 +21,7 @@ public class SolverClingo extends SolverBase {
     protected List<String> getAnswerSetStrings(Process exec) throws IOException {
         InputStream inputStream = exec.getInputStream();
         List<String> allLines = IOUtils.readLines(inputStream);
-        List<String> answerSetLines = new ArrayList();
+        List<String> answerSetLines = new ArrayList<>();
         for (String line : allLines) {
             if (line.startsWith("%") || line.startsWith("SATISFIABLE")) {
                 continue;

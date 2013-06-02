@@ -7,7 +7,7 @@ import asp4j.solver.ReasoningMode;
 import asp4j.solver.Solver;
 import asp4j.solver.SolverClingo;
 import asp4j.solver.SolverDLV;
-import asp4j.solver.object.FilterBinding;
+import asp4j.solver.object.Binding;
 import asp4j.solver.object.ObjectSolver;
 import asp4j.solver.object.ObjectSolverImpl;
 import java.io.File;
@@ -67,8 +67,8 @@ public class TestPersonAnnotated {
         ObjectSolver solver = new ObjectSolverImpl(externalSolver);
 
         //"person.lp"
-        Program<Object> program = new ProgramBuilder().add(new File(rulefile)).add(person).build();
-        FilterBinding binding = new FilterBinding().add(Male.class).add(Female.class);
+        Program<Object> program = new ProgramBuilder<>().add(new File(rulefile)).add(person).build();
+        Binding binding = new Binding().addFilter(Male.class).addFilter(Female.class);
         List<AnswerSet<Object>> answerSets = solver.getAnswerSets(program, binding);
 
         // ==> answerSets.size() == 2
@@ -86,7 +86,7 @@ public class TestPersonAnnotated {
         assertTrue(braveConsequence.contains(new Female("id42")));
         assertTrue(braveConsequence.contains(new Male("id42")));
 
-        binding.add(Person.class);
+        binding.addFilter(Person.class);
 
         cautiousConsequence = solver.getConsequence(program, binding, ReasoningMode.CAUTIOUS);
         // ==> cautiousConsequence.size() == 1
