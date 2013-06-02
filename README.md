@@ -2,7 +2,7 @@
 
 Answer Set Programming solver interface for Java
 
-Version 0.0.3-SNAPSHOT. Last update June 2, 2013
+Version 0.0.3. June 2, 2013
 
 ## Example
 
@@ -55,24 +55,23 @@ Solver externalSolver = new SolverDLV(); //or new SolverClingo();
 ObjectSolver solver = new ObjectSolverImpl(externalSolver); 
 
 Program<Object> program = new ProgramBuilder().add(new File("person.lp")).add(person).build();
-FilterBinding binding = new FilterBinding().add(Male.class).add(Female.class);
-List<AnswerSet<Object>> answerSets = solver.getAnswerSets(program, binding);
+Filter filter = new Filter().add(Male.class).add(Female.class);
+List<AnswerSet<Object>> answerSets = solver.getAnswerSets(program, filter);
 
 // ==> answerSets.size() == 2
 
-Set<Object> cautiousConsequence = solver.getConsequence(program, binding, ReasoningMode.CAUTIOUS);
+Set<Object> cautiousConsequence = solver.getConsequence(program, ReasoningMode.CAUTIOUS);
+
+// ==> cautiousConsequence.size() == 1
+// ==> cautiousConsequence.contains(person);
+
+cautiousConsequence = solver.getConsequence(program, ReasoningMode.CAUTIOUS, filter);
 
 // ==> cautiousConsequence.isEmpty()
 
-Set<Object> braveConsequence = solver.getConsequence(program, binding, ReasoningMode.BRAVE);
+Set<Object> braveConsequence = solver.getConsequence(program, ReasoningMode.BRAVE, filter);
 
 // ==> braveConsequence.size() == 2
 // ==> braveConsequence.contains(new Female("id42"))
 // ==> braveConsequence.contains(new Male("id42"))
-
-binding.add(Person.class);
-cautiousConsequence = solver.getConsequence(program, binding, ReasoningMode.CAUTIOUS);
-
-// ==> cautiousConsequence.size() == 1
-// ==> cautiousConsequence.contains(person)
 ```

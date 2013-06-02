@@ -31,6 +31,14 @@ public class TestPersonAnnotated {
     private final String rulefile_clingo = System.getProperty("user.dir") + "/src/test/clingo/person.lp";
 
     @Test
+    public void test_readme() throws Exception {
+        readme(new SolverDLV(), rulefile_dlv);
+        readme(new SolverClingo(), rulefile_clingo);
+        readme(new SolverDLV(), rulefile_common);
+        readme(new SolverClingo(), rulefile_common);
+    }
+
+    @Test
     public void test_dlv() throws Exception {
         test_answersets(new SolverDLV(), rulefile_dlv);
         test_cautiouscons(new SolverDLV(), rulefile_dlv);
@@ -73,6 +81,42 @@ public class TestPersonAnnotated {
      * {male(id42). person(id42).}
      * {female(id42). person(id42).}
      */
+    public void readme(Solver externalSolver, String rulefile) throws Exception {
+        Person person = new Person("id42");
+
+
+        ObjectSolver solver = new ObjectSolverImpl(externalSolver);
+
+        Program<Object> program = new ProgramBuilder().add(new File(rulefile)).add(person).build();
+        Filter filter = new Filter().add(Male.class).add(Female.class);
+        List<AnswerSet<Object>> answerSets = solver.getAnswerSets(program, filter);
+
+        // ==> answerSets.size() == 2
+        assertEquals(2,answerSets.size());
+
+        Set<Object> cautiousConsequence = solver.getConsequence(program, ReasoningMode.CAUTIOUS);
+
+        // ==> cautiousConsequence.size() == 1
+        assertEquals(1,cautiousConsequence.size());
+        // ==> cautiousConsequence.contains(person);
+        assertTrue(cautiousConsequence.contains(person));
+
+        cautiousConsequence = solver.getConsequence(program, ReasoningMode.CAUTIOUS, filter);
+
+        // ==> cautiousConsequence.isEmpty()
+        assertTrue(cautiousConsequence.isEmpty());
+
+        Set<Object> braveConsequence = solver.getConsequence(program, ReasoningMode.BRAVE, filter);
+
+        // ==> braveConsequence.size() == 2
+        assertEquals(2,braveConsequence.size());
+        // ==> braveConsequence.contains(new Female("id42"))
+        assertTrue(braveConsequence.contains(new Female("id42")));
+        // ==> braveConsequence.contains(new Male("id42"))
+        assertTrue(braveConsequence.contains(new Male("id42")));
+
+    }
+
     public void test_answersets(Solver externalSolver, String rulefile) throws Exception {
 
         Person person = new Person("id42");
@@ -202,10 +246,10 @@ public class TestPersonAnnotated {
         Iterator<?> it = cons.iterator();
         Object first = it.next();
         if (first.equals(male)) {
-            assertEquals(female,it.next());        
+            assertEquals(female, it.next());
         } else {
-            assertEquals(female,first);
-            assertEquals(male,it.next());
+            assertEquals(female, first);
+            assertEquals(male, it.next());
         }
 
         //
@@ -221,8 +265,8 @@ public class TestPersonAnnotated {
 
         filter = new Filter(Female.class);
         cons = solver.getConsequence(program, ReasoningMode.BRAVE, filter);
-        assertEquals(1,cons.size());
-        assertEquals(female,cons.iterator().next());
+        assertEquals(1, cons.size());
+        assertEquals(female, cons.iterator().next());
 
     }
 }

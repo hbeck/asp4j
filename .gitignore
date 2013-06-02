@@ -2,3 +2,4 @@ target/
 *~
 TODO
 nb-configuration.xml
+src/test/java/asp4j/test/annotated/person/uri/
