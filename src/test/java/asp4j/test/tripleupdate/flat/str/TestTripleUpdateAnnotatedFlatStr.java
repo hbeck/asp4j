@@ -7,7 +7,6 @@ import asp4j.solver.ReasoningMode;
 import asp4j.solver.Solver;
 import asp4j.solver.SolverClingo;
 import asp4j.solver.SolverDLV;
-import asp4j.solver.object.Binding;
 import asp4j.solver.object.Filter;
 import asp4j.solver.object.ObjectSolver;
 import asp4j.solver.object.ObjectSolverImpl;
@@ -73,6 +72,7 @@ public class TestTripleUpdateAnnotatedFlatStr {
         Set<Object> cautiousConsequence = solver.getConsequence(program, ReasoningMode.CAUTIOUS);
         Set<Object> braveConsequence = solver.getConsequence(program, ReasoningMode.BRAVE);
         assertTrue(CollectionUtils.isEqualCollection(cautiousConsequence, braveConsequence));
+        assertEquals(3,cautiousConsequence.size());
 
     }
 
@@ -110,6 +110,7 @@ public class TestTripleUpdateAnnotatedFlatStr {
 
         Set<Object> cautiousConsequence = solver.getConsequence(program, ReasoningMode.CAUTIOUS, filter);
         Set<Object> braveConsequence = solver.getConsequence(program, ReasoningMode.BRAVE, filter);
+        assertEquals(1,cautiousConsequence.size());
         assertTrue(CollectionUtils.isEqualCollection(cautiousConsequence, braveConsequence));
 
         Conflict expected = new Conflict();
@@ -124,6 +125,7 @@ public class TestTripleUpdateAnnotatedFlatStr {
         assertTrue(as.get(0).atoms().contains(expected));
         assertEquals(1, as.size());
         assertEquals(1, as.get(0).atoms().size());
+        assertEquals(expected,cautiousConsequence.iterator().next());
         
         //
         filter = new Filter(SomeConflict.class);

@@ -5,7 +5,7 @@ import asp4j.program.Program;
 /**
  *
  * @author hbeck
- * date May 25, 2013
+ * May 25, 2013
  */
 public interface ConflictSpecification {
     

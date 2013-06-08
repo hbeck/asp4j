@@ -14,9 +14,12 @@ import asp4j.lang.TermImpl;
 import asp4j.mapping.annotations.Arg;
 import asp4j.mapping.annotations.DefAtom;
 import asp4j.mapping.annotations.DefConstant;
+import asp4j.mapping.annotations.DefEnumAtoms;
+import asp4j.mapping.annotations.DefEnumConstants;
 import asp4j.mapping.annotations.DefTerm;
 import asp4j.mapping.object.AnyMapping;
 import asp4j.mapping.object.InputMapping;
+import asp4j.mapping.object.Mapping;
 import asp4j.mapping.object.OutputMapping;
 import asp4j.mapping.object.atom.AtomMapping;
 import asp4j.mapping.object.constant.ConstantMapping;
@@ -97,9 +100,9 @@ public class Binding {
         OutputMapping<T, E> mapping = (OutputMapping<T, E>) registry.getOutputMapping(e);
         return mapping.asObject(e);
     }
-    
+
     protected <T, E extends LangElem> T mapAsObject(E e, Class<? extends T> clazz) throws Exception {
-        OutputMapping<T, E> mapping = (OutputMapping<T, E>) registry.getOutputMapping(e, clazz);
+        OutputMapping<T, E> mapping = (OutputMapping<T, E>) registry.getOutputMapping(clazz);
         return mapping.asObject(e);
     }
 
@@ -167,8 +170,12 @@ public class Binding {
 
         private <T, E extends LangElem> void addOutputMapping(Class<? extends T> clazz, OutputMapping<T, E> mapping) {
             outputMappings.put(clazz, mapping);
-            if (mapping instanceof HasSymbol) {
-                symbol2class.put(((HasSymbol)mapping).symbol(),clazz);
+            if (clazz.isEnum()) {
+                for (T enumValue : clazz.getEnumConstants()) {
+                    symbol2class.put(enumValue.toString(),clazz);
+                }
+            } else if (mapping instanceof HasSymbol) {
+                symbol2class.put(((HasSymbol) mapping).symbol(), clazz);
             }
         }
 
@@ -200,14 +207,32 @@ public class Binding {
          * @param clazz
          * @throws Exception
          */
-        private <T, E extends LangElem> void add(final Class<T> clazz) throws Exception {
-
+        private void add(final Class<?> clazz) throws Exception {
             if (isRegistered(clazz)) {
                 return;
             }
+            if (clazz.isEnum()) {
+                addEnum(clazz);
+            } else {
+                addAnnotatedClass(clazz);
+            }
+        }
 
+        private void addEnum(final Class clazz) throws Exception {
+            Mapping<?, ?> mapping;
+            if (clazz.isAnnotationPresent(DefEnumAtoms.class)) {
+                mapping = createAtomEnumMapping(clazz);
+            } else if (clazz.isAnnotationPresent(DefEnumConstants.class)) {
+                mapping = createConstantEnumMapping(clazz);
+            } else {
+                return;
+            }
+            addInputMapping(clazz, (InputMapping<?, ?>) mapping);
+            addOutputMapping(clazz, (OutputMapping<?, ?>) mapping);
+        }
+
+        private <T, E extends LangElem> void addAnnotatedClass(final Class<T> clazz) throws Exception {
             AnyMapping<T, ?> mapping;
-
             if (clazz.isAnnotationPresent(DefAtom.class)) {
                 mapping = createAtomMapping(clazz);
             } else if (clazz.isAnnotationPresent(DefTerm.class)) {
@@ -224,13 +249,46 @@ public class Binding {
             if (mapping instanceof OutputMapping) {
                 addOutputMapping(clazz, (OutputMapping<T, E>) mapping);
             }
-            
+
             Collection<Class<?>> innerClasses = getAnnotatedInnerClasses(clazz);
             for (Class<?> innerClass : innerClasses) {
                 this.add(innerClass);
             }
         }
-        
+
+        private <T extends Enum<T>> AtomMapping<T> createAtomEnumMapping(final Class<T> enumType) {
+            return new AtomMapping<T>() {
+                @Override
+                public Atom asLangElem(T t) throws Exception {
+                    return new AtomImpl(t.name());
+                }
+
+                @Override
+                public T asObject(Atom a) throws Exception {
+                    return Enum.valueOf(enumType, a.symbol());
+                }
+
+                @Override
+                public String symbol() {
+                    throw new UnsupportedOperationException("symbol cannot be resolved for mapped enum");
+                }
+            };
+        }
+
+        private <T extends Enum<T>> ConstantMapping<T> createConstantEnumMapping(final Class<T> enumType) {
+            return new ConstantMapping<T>() {
+                @Override
+                public Constant asLangElem(T t) throws Exception {
+                    return new ConstantImpl(t.name());
+                }
+
+                @Override
+                public T asObject(Constant c) throws Exception {
+                    return Enum.valueOf(enumType, c.symbol());
+                }
+            };
+        }
+
         private Collection<Class<?>> getAnnotatedInnerClasses(Class<?> clazz) {
             Collection<Class<?>> classes = new HashSet<>();
             for (Method method : clazz.getMethods()) {
@@ -257,13 +315,13 @@ public class Binding {
             }
             throw new Exception("no input mapping found for class " + clazz);
         }
-        
+
         private <T, E extends LangElem> OutputMapping<T, E> getOutputMapping(E e) throws Exception {
             Class<? extends T> clazz = (Class<? extends T>) symbol2class.get(e.symbol());
-            return getOutputMapping(e, clazz);
-        }        
+            return getOutputMapping(clazz);
+        }
 
-        private <T, E extends LangElem> OutputMapping<T, E> getOutputMapping(E e, Class<? extends T> clazz) throws Exception {            
+        private <T, E extends LangElem> OutputMapping<T, E> getOutputMapping(Class<? extends T> clazz) throws Exception {
             OutputMapping<?, ?> mapping = outputMappings.get(clazz);
             if (mapping != null) {
                 return (OutputMapping<T, E>) mapping;
@@ -370,7 +428,7 @@ public class Binding {
                 int argIdx = argAnnotation.value();
                 Method setterMethod = clazz.getMethod(setterName, type);
                 Term term = input.getArg(argIdx);
-                setterMethod.invoke(object, mapAsObject(term,type));
+                setterMethod.invoke(object, mapAsObject(term, type));
             }
         }
 

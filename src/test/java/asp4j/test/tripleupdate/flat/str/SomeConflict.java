@@ -8,7 +8,7 @@ import java.util.Objects;
  * @author hbeck
  * date May 28, 2013
  */
-@DefAtom("some_conflict")
+@DefAtom("conflict")
 public class SomeConflict {
 
     @Override
