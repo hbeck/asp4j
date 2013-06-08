@@ -68,7 +68,7 @@ public class ObjectSolverImpl implements ObjectSolver {
     private List<AnswerSet<Object>> computeAnswerSets(Program<?> program, Binding binding, Filter filter) throws Exception {
         Program<Atom> atomProgram = getAtomProgram(program, binding, filter);
         List<AnswerSet<Atom>> answerSets = solver.getAnswerSets(atomProgram);
-        return binding.filterAndMap(answerSets,filter);
+        return binding.filterAndMap(answerSets, filter);
     }
 
     private Program<Atom> getAtomProgram(Program<?> program, Binding binding, Filter filter) throws Exception {
@@ -76,7 +76,7 @@ public class ObjectSolverImpl implements ObjectSolver {
         ProgramBuilder<Atom> builder = new ProgramBuilder<>();
         builder.addFiles(program.getFiles());
         for (Object input : program.getInput()) {
-            builder.add(binding.mapObjectAsAtom(input));
+            builder.add((Atom) binding.mapAsLangElem(input));
         }
         return builder.build();
     }
@@ -95,5 +95,6 @@ public class ObjectSolverImpl implements ObjectSolver {
         } else {
             binding.addAll(filterClasses);
         }
+        //TODO verify that all needed bindings are provided
     }
 }

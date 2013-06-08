@@ -2,6 +2,5 @@ target/
 *~
 TODO
 nb-configuration.xml
-src/test/java/asp4j/test/person/uri/
 src/test/java/asp4j/test/rdf/
 notes.md

@@ -21,7 +21,7 @@ import org.openrdf.model.impl.StatementImpl;
 import org.openrdf.model.impl.URIImpl;
 
 /**
- * 
+ *
  * Triple Update. Mapping via Annotations, using terms. Only strings for values.
  *
  * @author hbeck date May 30, 2013
@@ -62,8 +62,8 @@ public class TestTripleUpdateAnnotatedTermStr {
                 .add(new File(rulefile))
                 .add(new Addition(car_hasColor_blue))
                 .add(new Addition(hasColor_inverseOf_colorOf))
-                .build();        
- 
+                .build();
+
         List<AnswerSet<Object>> as = solver.getAnswerSets(program);
 
         assertEquals(1, as.size());
@@ -121,12 +121,12 @@ public class TestTripleUpdateAnnotatedTermStr {
         assertTrue(as.get(0).atoms().contains(expected));
         assertEquals(1, as.size());
         assertEquals(1, as.get(0).atoms().size());
-        
+
         //
         filter = new Filter(SomeConflict.class);
         Set<Object> cons = solver.getConsequence(program, ReasoningMode.CAUTIOUS, filter);
         assertEquals(1, cons.size());
-        assertEquals(new SomeConflict(),(SomeConflict)cons.iterator().next());
+        assertEquals(new SomeConflict(), (SomeConflict) cons.iterator().next());
     }
 
     private static Triple triple(String subject, String predicate, String object) {
