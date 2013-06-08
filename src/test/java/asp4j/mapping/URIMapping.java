@@ -1,4 +1,4 @@
-package asp4j.test.person.uri;
+package asp4j.mapping;
 
 import asp4j.lang.Constant;
 import asp4j.lang.ConstantImpl;

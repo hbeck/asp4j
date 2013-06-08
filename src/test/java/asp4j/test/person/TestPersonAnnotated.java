@@ -84,7 +84,6 @@ public class TestPersonAnnotated {
     public void readme(Solver externalSolver, String rulefile) throws Exception {
         Person person = new Person("id42");
 
-
         ObjectSolver solver = new ObjectSolverImpl(externalSolver);
 
         Program<Object> program = new ProgramBuilder().add(new File(rulefile)).add(person).build();

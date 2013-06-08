@@ -13,13 +13,13 @@ import org.openrdf.model.URI;
 public class Triple {
 
     protected URI subject;
-    protected URI predicate;
+    protected Predicate predicate;
     protected URI object;
     
     public Triple() {
     }
 
-    public Triple(URI subject, URI predicate, URI object) {
+    public Triple(URI subject, Predicate predicate, URI object) {
         this.subject = subject;
         this.predicate = predicate;
         this.object = object;
@@ -35,11 +35,11 @@ public class Triple {
     }
 
     @Arg(1)
-    public URI getPredicate() {
+    public Predicate getPredicate() {
         return predicate;
     }
 
-    public void setPredicate(URI predicate) {
+    public void setPredicate(Predicate predicate) {
         this.predicate = predicate;
     }
 

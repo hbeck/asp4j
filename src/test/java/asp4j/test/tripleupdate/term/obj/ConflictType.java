@@ -10,8 +10,7 @@ import asp4j.mapping.annotations.MapWith;
 @DefEnumConstants
 public enum ConflictType {
     
-    single_violation,
-    @MapWith("narrower_broader")
-    narrower_broader_clash
+    @MapWith("single_violation") single_violation, //redundancy test
+    @MapWith("narrower_broader") narrower_broader_clash
 
 }

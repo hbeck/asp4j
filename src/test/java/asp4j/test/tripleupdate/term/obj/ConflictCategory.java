@@ -13,7 +13,6 @@ public enum ConflictCategory {
     //use default name for conflict
     conflict,
     //use explicit renaming for skos_conflict
-    @MapWith("skos_conflict")
-    skos
+    @MapWith("skos_conflict") skos
 
 }

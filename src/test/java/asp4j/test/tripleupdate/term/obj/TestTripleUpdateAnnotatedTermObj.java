@@ -1,6 +1,7 @@
 package asp4j.test.tripleupdate.term.obj;
 
 import asp4j.lang.AnswerSet;
+import asp4j.mapping.URIMapping;
 import asp4j.program.Program;
 import asp4j.program.ProgramBuilder;
 import asp4j.solver.ReasoningMode;
@@ -64,9 +65,9 @@ public class TestTripleUpdateAnnotatedTermObj {
 
     public void test(Solver externalSolver, String rulefile) throws Exception {
 
-        Triple car_hasColor_blue = triple("urn:car", "urn:hasColor", "urn:blue");
-        Triple blue_colorOf_car = triple("urn:blue", "urn:colorOf", "urn:car");
-        Triple hasColor_inverseOf_colorOf = triple("urn:hasColor", "owl:inverseOf", "urn:colorOf");
+        Triple car_hasColor_blue = triple("urn:car", Predicate.urn_hasColor, "urn:blue");
+        Triple blue_colorOf_car = triple("urn:blue", Predicate.urn_colorOf, "urn:car");
+        Triple hasColor_inverseOf_colorOf = triple(Predicate.urn_hasColor.toString(), Predicate.owl_inverseOf, Predicate.urn_colorOf.toString());
 
         ObjectSolver solver = new ObjectSolverImpl(externalSolver);
         Binding binding = new Binding().add(URI.class, new URIMapping());
@@ -101,12 +102,12 @@ public class TestTripleUpdateAnnotatedTermObj {
          * --> confl(single_violation(car,hasColor,blue,red))
          */
 
-        Triple hasColor_inverseOf_colorOf = triple("urn:hasColor", "owl:inverseOf", "urn:colorOf");
-        Triple hasColor_type_single = triple("urn:hasColor", "rdf:type", "ex:single");
-        Triple car_hasColor_blue = triple("urn:car", "urn:hasColor", "urn:blue");
-        Triple blue_colorOf_car = triple("urn:blue", "urn:colorOf", "urn:car");
-        Triple red_colorOf_car = triple("urn:red", "urn:colorOf", "urn:car");
-        Triple car_hasColor_red = triple("urn:car", "urn:hasColor", "urn:red");
+        Triple hasColor_inverseOf_colorOf = triple(Predicate.urn_hasColor.toString(), Predicate.owl_inverseOf, Predicate.urn_colorOf.toString());
+        Triple hasColor_type_single = triple(Predicate.urn_hasColor.toString(), Predicate.rdf_type, "ex:single");
+        Triple car_hasColor_blue = triple("urn:car", Predicate.urn_hasColor, "urn:blue");
+        Triple blue_colorOf_car = triple("urn:blue", Predicate.urn_colorOf, "urn:car");
+        Triple red_colorOf_car = triple("urn:red", Predicate.urn_colorOf, "urn:car");
+        Triple car_hasColor_red = triple("urn:car", Predicate.urn_hasColor, "urn:red");
 
         ObjectSolver solver = new ObjectSolverImpl(externalSolver);
         Binding binding = new Binding().add(URI.class, new URIMapping());
@@ -146,12 +147,6 @@ public class TestTripleUpdateAnnotatedTermObj {
         assertEquals(1, cons.size());
         assertEquals(ConflictCategory.conflict, (ConflictCategory) cons.iterator().next());
         
-        //
-//        filter = new Filter(ConflictCategory.some_conflict);
-//        cons = solver.getConsequence(program, ReasoningMode.CAUTIOUS, binding, filter);
-//        assertEquals(1, cons.size());
-//        assertEquals(ConflictCategory.some_conflict, (ConflictCategory) cons.iterator().next());
-
     }
     
     public void test_conflict_skos(Solver externalSolver, String rulefile) throws Exception {
@@ -167,8 +162,8 @@ public class TestTripleUpdateAnnotatedTermObj {
          * --> some_skos_conflict
          */
 
-        Triple vienna_broader_austria = triple("urn:vienna", "skos:broader", "urn:austria");
-        Triple vienna_narrower_austria = triple("urn:vienna", "skos:narrower", "urn:austria");
+        Triple vienna_broader_austria = triple("urn:vienna", Predicate.broader, "urn:austria");
+        Triple vienna_narrower_austria = triple("urn:vienna", Predicate.narrower, "urn:austria");
 
         ObjectSolver solver = new ObjectSolverImpl(externalSolver);
         Binding binding = new Binding().add(URI.class, new URIMapping());
@@ -186,8 +181,8 @@ public class TestTripleUpdateAnnotatedTermObj {
         assertTrue(CollectionUtils.isEqualCollection(cautiousConsequence, braveConsequence));
         assertEquals(1,cautiousConsequence.size());
         
-        Triple austria_narrower_vienna = triple("urn:austria", "skos:narrower", "urn:vienna");
-        Triple austria_broader_vienna = triple("urn:austria", "skos:broader", "urn:vienna");
+        Triple austria_narrower_vienna = triple("urn:austria", Predicate.narrower, "urn:vienna");
+        Triple austria_broader_vienna = triple("urn:austria", Predicate.broader, "urn:vienna");
         Conflict expected = new Conflict();
         //confl(single_violation,car,hasColor,blue,red))
         expected.setType(ConflictType.narrower_broader_clash);
@@ -213,14 +208,10 @@ public class TestTripleUpdateAnnotatedTermObj {
         }        
         
         //
-//        filter = new Filter(ConflictCategory.some_skos_conflict);
-//        cons = solver.getConsequence(program, ReasoningMode.CAUTIOUS, binding, filter);
-//        assertEquals(1, cons.size());
-//        assertEquals(ConflictCategory.some_conflict, (ConflictCategory) cons.iterator().next());
 
     }
 
-    private static Triple triple(String subject, String predicate, String object) {
-        return new Triple(new URIImpl(subject), new URIImpl(predicate), new URIImpl(object));
+    private static Triple triple(String subject, Predicate predicate, String object) {
+        return new Triple(new URIImpl(subject), predicate, new URIImpl(object));
     }
 }
