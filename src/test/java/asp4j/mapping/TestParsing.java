@@ -1,5 +1,6 @@
 package asp4j.mapping;
 
+import asp4j.util.ParseUtils;
 import asp4j.lang.Atom;
 import asp4j.lang.Constant;
 import asp4j.lang.Term;

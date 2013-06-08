@@ -4,7 +4,7 @@ import asp4j.lang.AnswerSet;
 import asp4j.lang.AnswerSetImpl;
 import asp4j.lang.Atom;
 import asp4j.lang.AtomImpl;
-import asp4j.mapping.ParseUtils;
+import asp4j.util.ParseUtils;
 import asp4j.program.Program;
 import java.io.BufferedWriter;
 import java.io.File;
