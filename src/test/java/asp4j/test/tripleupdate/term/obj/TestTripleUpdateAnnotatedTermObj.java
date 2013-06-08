@@ -190,7 +190,7 @@ public class TestTripleUpdateAnnotatedTermObj {
         Triple austria_broader_vienna = triple("urn:austria", "skos:broader", "urn:vienna");
         Conflict expected = new Conflict();
         //confl(single_violation,car,hasColor,blue,red))
-        expected.setType(ConflictType.narrower_broader);
+        expected.setType(ConflictType.narrower_broader_clash);
         expected.setT1(austria_narrower_vienna);
         expected.setT2(austria_broader_vienna);
 
@@ -206,9 +206,9 @@ public class TestTripleUpdateAnnotatedTermObj {
         Iterator<Object> it = cons.iterator();
         ConflictCategory category = (ConflictCategory) it.next();
         if (category.equals(ConflictCategory.conflict)) {
-            assertEquals(ConflictCategory.skos_conflict,(ConflictCategory)it.next());
+            assertEquals(ConflictCategory.skos,(ConflictCategory)it.next());
         } else {
-            assertEquals(ConflictCategory.skos_conflict,category);
+            assertEquals(ConflictCategory.skos,category);
             assertEquals(ConflictCategory.conflict,(ConflictCategory)it.next());
         }        
         

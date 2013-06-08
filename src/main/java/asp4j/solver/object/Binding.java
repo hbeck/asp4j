@@ -18,10 +18,13 @@ import asp4j.mapping.annotations.DefEnumAtoms;
 import asp4j.mapping.annotations.DefEnumConstants;
 import asp4j.mapping.annotations.DefTerm;
 import asp4j.mapping.object.AnyMapping;
+import asp4j.mapping.object.HasTargetNames;
 import asp4j.mapping.object.InputMapping;
 import asp4j.mapping.object.Mapping;
 import asp4j.mapping.object.OutputMapping;
+import asp4j.mapping.object.atom.AtomEnumMapping;
 import asp4j.mapping.object.atom.AtomMapping;
+import asp4j.mapping.object.constant.ConstantEnumMapping;
 import asp4j.mapping.object.constant.ConstantMapping;
 import asp4j.mapping.object.term.TermMapping;
 import java.lang.reflect.Method;
@@ -171,9 +174,10 @@ public class Binding {
         private <T, E extends LangElem> void addOutputMapping(Class<? extends T> clazz, OutputMapping<T, E> mapping) {
             outputMappings.put(clazz, mapping);
             if (clazz.isEnum()) {
-                for (T enumValue : clazz.getEnumConstants()) {
-                    symbol2class.put(enumValue.toString(),clazz);
-                }
+                HasTargetNames enumMapping = (HasTargetNames)mapping;
+                for (String targetName : enumMapping.getTargetNames()) {
+                    symbol2class.put(targetName, clazz);
+                }                
             } else if (mapping instanceof HasSymbol) {
                 symbol2class.put(((HasSymbol) mapping).symbol(), clazz);
             }
@@ -221,9 +225,9 @@ public class Binding {
         private void addEnum(final Class clazz) throws Exception {
             Mapping<?, ?> mapping;
             if (clazz.isAnnotationPresent(DefEnumAtoms.class)) {
-                mapping = createAtomEnumMapping(clazz);
+                mapping = new AtomEnumMapping(clazz);
             } else if (clazz.isAnnotationPresent(DefEnumConstants.class)) {
-                mapping = createConstantEnumMapping(clazz);
+                mapping = new ConstantEnumMapping(clazz);
             } else {
                 return;
             }
@@ -254,40 +258,7 @@ public class Binding {
             for (Class<?> innerClass : innerClasses) {
                 this.add(innerClass);
             }
-        }
-
-        private <T extends Enum<T>> AtomMapping<T> createAtomEnumMapping(final Class<T> enumType) {
-            return new AtomMapping<T>() {
-                @Override
-                public Atom asLangElem(T t) throws Exception {
-                    return new AtomImpl(t.name());
-                }
-
-                @Override
-                public T asObject(Atom a) throws Exception {
-                    return Enum.valueOf(enumType, a.symbol());
-                }
-
-                @Override
-                public String symbol() {
-                    throw new UnsupportedOperationException("symbol cannot be resolved for mapped enum");
-                }
-            };
-        }
-
-        private <T extends Enum<T>> ConstantMapping<T> createConstantEnumMapping(final Class<T> enumType) {
-            return new ConstantMapping<T>() {
-                @Override
-                public Constant asLangElem(T t) throws Exception {
-                    return new ConstantImpl(t.name());
-                }
-
-                @Override
-                public T asObject(Constant c) throws Exception {
-                    return Enum.valueOf(enumType, c.symbol());
-                }
-            };
-        }
+        }        
 
         private Collection<Class<?>> getAnnotatedInnerClasses(Class<?> clazz) {
             Collection<Class<?>> classes = new HashSet<>();
