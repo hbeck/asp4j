@@ -95,6 +95,5 @@ public class ObjectSolverImpl implements ObjectSolver {
         } else {
             binding.addAll(filterClasses);
         }
-        //TODO verify that all needed bindings are provided
     }
 }

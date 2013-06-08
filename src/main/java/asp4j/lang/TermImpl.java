@@ -5,7 +5,7 @@ import java.util.Objects;
 
 /**
  *
- * @author hbeck date May 30, 2013
+ * @author hbeck  May 30, 2013
  */
 public class TermImpl implements Term {
 

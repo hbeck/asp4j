@@ -11,7 +11,7 @@ import java.util.List;
 
 /**
  *
- * @author hbeck date May 30, 2013
+ * @author hbeck May 30, 2013
  */
 public abstract class ParseUtils {
 
@@ -36,7 +36,7 @@ public abstract class ParseUtils {
         return new TermImpl(functionSymbol, terms);
     }
 
-    //ps(c1,t1(t2(c2,c3),c4))
+    //e.g. ps(c1,t1(t2(c2,c3),c4))
     public static Atom parseAtom(String atomString) throws ParseException {
         String s = atomString.trim();
         if (s.endsWith(".")) {

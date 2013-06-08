@@ -7,6 +7,7 @@ import asp4j.lang.AtomImpl;
 import asp4j.lang.Constant;
 import asp4j.lang.ConstantImpl;
 import asp4j.lang.HasArgs;
+import asp4j.lang.HasSymbol;
 import asp4j.lang.LangElem;
 import asp4j.lang.Term;
 import asp4j.lang.TermImpl;
@@ -151,11 +152,6 @@ public class Binding {
                 public String asObject(Constant constant) throws Exception {
                     return constant.symbol();
                 }
-
-                @Override
-                public String symbol() {
-                    return null; //TODO
-                }
             };
             addInputMapping(String.class, cm);
             addOutputMapping(String.class, cm);
@@ -171,9 +167,8 @@ public class Binding {
 
         private <T, E extends LangElem> void addOutputMapping(Class<? extends T> clazz, OutputMapping<T, E> mapping) {
             outputMappings.put(clazz, mapping);
-            String symbol = mapping.symbol();
-            if (symbol != null) {
-                symbol2class.put(symbol, clazz);
+            if (mapping instanceof HasSymbol) {
+                symbol2class.put(((HasSymbol)mapping).symbol(),clazz);
             }
         }
 
@@ -351,19 +346,13 @@ public class Binding {
             return new ConstantMapping<T>() {
                 @Override
                 public Constant asLangElem(T t) throws Exception {
-                    return new ConstantImpl(symbol());
+                    DefConstant constAnn = clazz.getAnnotation(DefConstant.class);
+                    return new ConstantImpl(constAnn.value());
                 }
 
                 @Override
                 public T asObject(Constant constant) throws Exception {
                     return clazz.newInstance();
-                }
-
-                @Override
-                public String symbol() {
-                    DefConstant constAnn = clazz.getAnnotation(DefConstant.class);
-                    String symbol = constAnn.value();
-                    return symbol;
                 }
             };
         }

@@ -6,7 +6,7 @@ import java.util.Collection;
 /**
  *
  * @author hbeck
- * date May 19, 2013
+ *  May 19, 2013
  */
 public interface Program<T> {
     

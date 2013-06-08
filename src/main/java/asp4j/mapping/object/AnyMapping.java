@@ -8,9 +8,4 @@ import asp4j.lang.LangElem;
  */
 public interface AnyMapping<T, E extends LangElem> {
 
-//    Class<T> clazz();
-//
-//    Binding getBinding();
-//
-//    void setBinding(Binding binding);
 }

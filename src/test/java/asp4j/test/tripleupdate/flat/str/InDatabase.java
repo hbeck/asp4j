@@ -6,8 +6,7 @@ import org.openrdf.model.Statement;
 
 /**
  *
- * @author hbeck 
- * date May 15, 2013
+ * @author hbeck May 15, 2013
  */
 @DefAtom("db")
 public class InDatabase extends TypedTriple {

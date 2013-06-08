@@ -6,7 +6,7 @@ import java.util.Set;
 
 /**
  * @author hbeck 
- * date Apr 14, 2013
+ *  Apr 14, 2013
  */
 public class AnswerSetImpl<T> implements AnswerSet<T> {
 

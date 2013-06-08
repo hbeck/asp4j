@@ -24,14 +24,4 @@ public class URIMapping implements ConstantMapping<URI> {
         return new URIImpl(replaced);
     }
 
-//    @Override
-//    public Class<URI> clazz() {
-//        return URI.class;
-//    }
-
-    @Override
-    public String symbol() {
-        return null; //TODO
-    }
-
 }

@@ -8,7 +8,7 @@ import org.apache.commons.io.IOUtils;
 
 /**
  *
- * @author hbeck date May 27, 2013
+ * @author hbeck  May 27, 2013
  */
 public class SolverClingo extends SolverBase {
 

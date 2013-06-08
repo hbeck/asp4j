@@ -4,8 +4,7 @@ import java.util.Set;
 
 /**
  *
- * @author hbeck
- * date Apr 14, 2013
+ * @author hbeck Apr 14, 2013
  */
 public interface AnswerSet<T> {
     

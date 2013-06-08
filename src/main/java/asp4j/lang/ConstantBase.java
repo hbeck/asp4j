@@ -3,7 +3,7 @@ package asp4j.lang;
 /**
  *
  * @author hbeck
- * date May 30, 2013
+ *  May 30, 2013
  */
 public abstract class ConstantBase implements Constant {
 
