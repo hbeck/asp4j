@@ -1,4 +1,4 @@
-package asp4j.test.gender;
+package asp4j.test.gender.v1;
 
 import asp4j.mapping.annotations.Arg;
 import asp4j.mapping.annotations.DefAtom;

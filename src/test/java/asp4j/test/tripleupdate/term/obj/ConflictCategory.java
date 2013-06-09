@@ -1,7 +1,7 @@
 package asp4j.test.tripleupdate.term.obj;
 
 import asp4j.mapping.annotations.DefEnumAtoms;
-import asp4j.mapping.annotations.MapWith;
+import asp4j.mapping.annotations.MapAs;
 
 /**
  *
@@ -13,6 +13,6 @@ public enum ConflictCategory {
     //use default name for conflict
     conflict,
     //use explicit renaming for skos_conflict
-    @MapWith("skos_conflict") skos
+    @MapAs("skos_conflict") skos
 
 }

@@ -1,4 +1,6 @@
-0.0.4
+0.0.5
+
+0.0.4 2013-06-09
 
 - simplification: only annotations and explicit mappings, no interface-based mapping
 - enum support to define atoms and constants

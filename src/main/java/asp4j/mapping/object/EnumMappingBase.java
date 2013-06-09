@@ -1,7 +1,7 @@
 package asp4j.mapping.object;
 
 import asp4j.lang.LangElem;
-import asp4j.mapping.annotations.MapWith;
+import asp4j.mapping.annotations.MapAs;
 import java.lang.reflect.Field;
 import java.util.Collections;
 import java.util.HashMap;
@@ -31,8 +31,8 @@ public abstract class EnumMappingBase<T extends Enum<T>, E extends LangElem> imp
     private void init() {
         for (Field field : enumType.getDeclaredFields()) {
             if (field.isEnumConstant()) {
-                if (field.isAnnotationPresent(MapWith.class)) {
-                    String targetName = field.getAnnotation(MapWith.class).value();
+                if (field.isAnnotationPresent(MapAs.class)) {
+                    String targetName = field.getAnnotation(MapAs.class).value();
                     constantName2targetName.put(field.getName(), targetName);
                     targetName2constantName.put(targetName, field.getName());
                     targetNames.add(targetName);

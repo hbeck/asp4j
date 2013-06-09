@@ -4,4 +4,5 @@ TODO
 nb-configuration.xml
 src/test/java/asp4j/test/rdf/
 src/test/java/asp4j/test/tripleupdate/term/obj/statement/
+src/test/java/asp4j/test/gender/v2
 notes.md

@@ -6,17 +6,12 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Explicit mapping name for enum constants, if their name is not used.
  *
  * @author hbeck June 8, 2013
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.FIELD)
-public @interface MapWith {
+@Target(ElementType.METHOD)
+public @interface MapAsAtom {
     
-    /**
-     * @return mapping name for enum constant (instead of default name)
-     */
     String value();    
-    
 }

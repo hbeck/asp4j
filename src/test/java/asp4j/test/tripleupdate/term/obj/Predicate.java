@@ -1,7 +1,7 @@
 package asp4j.test.tripleupdate.term.obj;
 
 import asp4j.mapping.annotations.DefEnumConstants;
-import asp4j.mapping.annotations.MapWith;
+import asp4j.mapping.annotations.MapAs;
 
 /**
  * predicate in a rdf triple. used to test input enum
@@ -15,8 +15,8 @@ public enum Predicate {
     rdf_type("rdf:type"),
     urn_hasColor("urn:hasColor"),
     urn_colorOf("urn:colorOf"),
-    @MapWith("skos_broader") broader("skos:broader"),
-    @MapWith("skos_narrower") narrower("skos:narrower");
+    @MapAs("skos_broader") broader("skos:broader"),
+    @MapAs("skos_narrower") narrower("skos:narrower");
     
     private String s;    
     

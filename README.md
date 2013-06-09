@@ -2,7 +2,7 @@
 
 Answer Set Programming solver interface for Java
 
-Version 0.0.4. June 9, 2013
+Version 0.0.5-SNAPSHOT. June 9, 2013
 
 ## Example
 

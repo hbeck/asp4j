@@ -1,7 +1,7 @@
 package asp4j.test.tripleupdate.term.obj;
 
 import asp4j.mapping.annotations.DefEnumConstants;
-import asp4j.mapping.annotations.MapWith;
+import asp4j.mapping.annotations.MapAs;
 
 /**
  *
@@ -10,7 +10,7 @@ import asp4j.mapping.annotations.MapWith;
 @DefEnumConstants
 public enum ConflictType {
     
-    @MapWith("single_violation") single_violation, //redundancy test
-    @MapWith("narrower_broader") narrower_broader_clash
+    @MapAs("single_violation") single_violation, //redundancy test
+    @MapAs("narrower_broader") narrower_broader_clash
 
 }
