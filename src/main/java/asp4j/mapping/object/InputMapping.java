@@ -1,6 +1,7 @@
 package asp4j.mapping.object;
 
 import asp4j.lang.LangElem;
+import asp4j.mapping.MappingException;
 
 /**
  * Defines how objects of class T are mappend to ASP language elements
@@ -9,6 +10,6 @@ import asp4j.lang.LangElem;
  */
 public interface InputMapping<T,E extends LangElem> extends AnyMapping<T,E> {    
     
-    E asLangElem(T t) throws Exception;
+    E asLangElem(T t) throws MappingException;
 
 }

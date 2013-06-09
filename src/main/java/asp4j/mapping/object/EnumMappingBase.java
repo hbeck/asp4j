@@ -49,7 +49,7 @@ public abstract class EnumMappingBase<T extends Enum<T>, E extends LangElem> imp
     }
 
     @Override
-    public final T asObject(E a) throws Exception {
+    public final T asObject(E a) {
         String constantName = targetName2constantName.containsKey(a.symbol())
                               ? targetName2constantName.get(a.symbol()) : a.symbol();
         return Enum.valueOf(enumType, constantName);

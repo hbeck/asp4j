@@ -3,12 +3,9 @@ package asp4j.solver;
 import asp4j.lang.AnswerSet;
 import asp4j.lang.AnswerSetImpl;
 import asp4j.lang.Atom;
-import asp4j.lang.AtomImpl;
 import asp4j.util.ParseUtils;
 import asp4j.program.Program;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -18,6 +15,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import org.apache.commons.io.FileUtils;
 
 /**
  *
@@ -69,16 +67,20 @@ public abstract class SolverBase implements Solver {
     }
 
     @Override
-    public List<AnswerSet<Atom>> getAnswerSets(Program<Atom> program) throws Exception {
+    public List<AnswerSet<Atom>> getAnswerSets(Program<Atom> program) throws SolverException {
         if (lastProgramAnswerSets != null && program.hashCode() == lastProgramHashCode) {
             return lastProgramAnswerSets;
         }
         lastProgramHashCode = program.hashCode();
         preSolverExec(program);
-        Process exec = Runtime.getRuntime().exec(solverCallString(program));
-        List<String> answerSetStrings = getAnswerSetStrings(exec);
-        postSolverExec(program);
-        return lastProgramAnswerSets = Collections.unmodifiableList(mapAnswerSetStrings(answerSetStrings));
+        try {
+            Process exec = Runtime.getRuntime().exec(solverCallString(program));
+            List<String> answerSetStrings = getAnswerSetStrings(exec);
+            postSolverExec(program);
+            return lastProgramAnswerSets = Collections.unmodifiableList(mapAnswerSetStrings(answerSetStrings));
+        } catch (IOException | ParseException e) {
+          throw new SolverException(e);
+        } 
     }
 
     /**
@@ -100,7 +102,7 @@ public abstract class SolverBase implements Solver {
     }
 
     @Override
-    public Set<Atom> getConsequence(Program<Atom> program, ReasoningMode mode) throws Exception {
+    public Set<Atom> getConsequence(Program<Atom> program, ReasoningMode mode) throws SolverException {
         List<AnswerSet<Atom>> as = getAnswerSets(program);
         switch (mode) {
             case BRAVE:
@@ -152,7 +154,7 @@ public abstract class SolverBase implements Solver {
 
     protected File tempInputFile() throws IOException {
         if (inputFile == null) {
-            inputFile = File.createTempFile("tmp-program", ".lp");
+            inputFile = File.createTempFile("asp4j-tmp-prog-", ".lp");
             inputFile.deleteOnExit();
         }
         return inputFile;
@@ -161,7 +163,7 @@ public abstract class SolverBase implements Solver {
     /**
      * executed before call to solver
      */
-    protected void preSolverExec(Program<Atom> program) throws Exception {
+    protected void preSolverExec(Program<Atom> program) throws SolverException {
         Collection<Atom> inputAtoms = program.getInput();
         if (inputAtoms.isEmpty()) {
             return;
@@ -170,14 +172,16 @@ public abstract class SolverBase implements Solver {
         for (Atom atom : inputAtoms) {
             sb.append(atom.toString());
         }
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(tempInputFile()))) {
-            writer.write(sb.toString());
+        try {
+            FileUtils.writeStringToFile(tempInputFile(),sb.toString());
+        } catch (IOException ex) {
+            throw new SolverException(ex);
         }
     }
 
     /**
      * executed after call to solver
      */
-    protected void postSolverExec(Program<Atom> program) throws Exception {
+    protected void postSolverExec(Program<Atom> program) {
     }
 }

@@ -13,13 +13,13 @@ import org.openrdf.model.impl.URIImpl;
 public class URIMapping implements ConstantMapping<URI> {
 
     @Override
-    public Constant asLangElem(URI uri) throws Exception {
+    public Constant asLangElem(URI uri) throws MappingException {
         String replaced = uri.stringValue().replaceAll("//", "_slsl_").replaceAll("#","_hash_").replaceAll(":","_");
         return new ConstantImpl(replaced);
     }
 
     @Override
-    public URI asObject(Constant term) throws Exception {
+    public URI asObject(Constant term) throws MappingException {
         String replaced = term.symbol().replaceAll("_slsl_","//").replaceAll("_hash_","#").replaceAll("_",":");
         return new URIImpl(replaced);
     }

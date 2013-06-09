@@ -15,7 +15,7 @@ public final class ConstantEnumMapping<T extends Enum<T>> extends EnumMappingBas
     }
 
     @Override
-    public Constant asLangElem(T t) throws Exception {
+    public Constant asLangElem(T t) {
         return new ConstantImpl(getTargetName(t));
     }
 

@@ -20,7 +20,7 @@ public final class AtomEnumMapping<T extends Enum<T>> extends EnumMappingBase<T,
     }
 
     @Override
-    public Atom asLangElem(T t) throws Exception {
+    public Atom asLangElem(T t) {
         return new AtomImpl(getTargetName(t));
     }
 
