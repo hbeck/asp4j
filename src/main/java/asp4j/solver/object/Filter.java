@@ -55,6 +55,13 @@ public class Filter {
         this.classes.add(clazz);
         return this;
     }
+    
+    public Filter addAll(Collection<Class<?>> classes) {
+        for (Class<?> clazz : classes) {
+            add(clazz);
+        }
+        return this;
+    }
 
     public Filter remove(Class<?> clazz) {
         this.classes.remove(clazz);

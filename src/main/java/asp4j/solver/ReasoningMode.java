@@ -3,7 +3,7 @@ package asp4j.solver;
 /**
  *
  * @author hbeck
- * date May 27, 2013
+ *  May 27, 2013
  */
 public enum ReasoningMode {
     

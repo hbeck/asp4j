@@ -9,7 +9,7 @@ import java.util.Set;
 /**
  *
  * @author hbeck 
- * date 2013-04-14
+ *  2013-04-14
  */
 public interface Solver {
     

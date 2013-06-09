@@ -6,7 +6,7 @@ import java.util.Collection;
 /**
  *
  * @author hbeck
- * date May 25, 2013
+ * May 25, 2013
  */
 public class ConflictException extends Exception {
     

@@ -1,0 +1,1 @@
+1 { gender(X,female) , gender(X,male) } 1 :- person(X).

@@ -1,0 +1,1 @@
+gender(X,female) v gender(X,male) :- person(X).

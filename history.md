@@ -1,3 +1,8 @@
+0.0.4
+
+- simplification: only annotations and explicit mappings, no interface-based mapping
+- enum support to define atoms and constants
+
 0.0.3 2013-06-02
 
 - separated binding and filter

@@ -27,4 +27,4 @@ pool(X,P,Z)  :- pool(X,P,Y), pool(Y,P,Z), transitive(P).
 
 % informal cardinality=1 constraint
 confl(single_violation,S,P,O1,O2) :- future(S,P,O1), future(S,P,O2), O1<O2, future(P,type,single).
-some_conflict :- confl(_,_,_,_,_).
+conflict :- confl(_,_,_,_,_).

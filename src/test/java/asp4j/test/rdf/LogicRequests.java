@@ -8,7 +8,7 @@ import org.openrdf.model.Statement;
 /**
  *
  * @author hbeck
- * date May 25, 2013
+ * May 25, 2013
  */
 public interface LogicRequests {    
     

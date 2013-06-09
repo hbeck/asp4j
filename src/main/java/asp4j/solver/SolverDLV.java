@@ -8,7 +8,7 @@ import org.apache.commons.io.IOUtils;
 
 /**
  *
- * @author hbeck date Apr 14, 2013
+ * @author hbeck  Apr 14, 2013
  */
 public class SolverDLV extends SolverBase {
 

@@ -9,7 +9,7 @@ import java.util.Set;
 /**
  *
  * @author hbeck 
- * date May 20, 2013
+ *  May 20, 2013
  */
 public class ProgramBuilder<T> {
 
