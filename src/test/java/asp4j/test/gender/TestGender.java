@@ -1,4 +1,4 @@
-package asp4j.test.person;
+package asp4j.test.gender;
 
 import asp4j.lang.AnswerSet;
 import asp4j.program.Program;
@@ -22,13 +22,13 @@ import org.junit.Test;
 
 /**
  *
- * @author hbeck date May 20, 2013
+ * @author hbeck Jun 9, 2013
  */
-public class TestPersonAnnotated {
+public class TestGender {
 
-    private final String rulefile_common = System.getProperty("user.dir") + "/src/test/common/person.lp";
-    private final String rulefile_dlv = System.getProperty("user.dir") + "/src/test/dlv/person.lp";
-    private final String rulefile_clingo = System.getProperty("user.dir") + "/src/test/clingo/person.lp";
+    private final String rulefile_common = System.getProperty("user.dir") + "/src/test/common/gender.lp";
+    private final String rulefile_dlv = System.getProperty("user.dir") + "/src/test/dlv/gender.lp";
+    private final String rulefile_clingo = System.getProperty("user.dir") + "/src/test/clingo/gender.lp";
 
     @Test
     public void test1() throws Exception {
@@ -70,33 +70,33 @@ public class TestPersonAnnotated {
     /*
      * RULES (common; dlv and clingo similar)
      * 
-     * female(X) :- person(X), not male(X).
-     * male(X)   :- person(X), not female(X).
+     * gender(X,female) :- person(X), not gender(X,male).
+     * gender(X,male)   :- person(X), not gender(X,female).
      * 
      * IN:
      * person(id42).
      * 
      * OUT:
      * 
-     * {male(id42). person(id42).}
-     * {female(id42). person(id42).}
+     * {gender(id42,female). person(id42).}
+     * {gender(id42,male). person(id42).}
      */
     public void test(Solver externalSolver, String rulefile) throws Exception {
         Person person = new Person("id42");
 
         ObjectSolver solver = new ObjectSolverImpl(externalSolver);
-
         Program<Object> program = new ProgramBuilder().add(new File(rulefile)).add(person).build();
-        Filter filter = new Filter().add(Male.class).add(Female.class);
+        Filter filter = new Filter().add(PersonGender.class);
+        
         List<AnswerSet<Object>> answerSets = solver.getAnswerSets(program, filter);
 
         // ==> answerSets.size() == 2
-        assertEquals(2,answerSets.size());
+        assertEquals(2, answerSets.size());
 
         Set<Object> cautiousConsequence = solver.getConsequence(program, ReasoningMode.CAUTIOUS);
 
         // ==> cautiousConsequence.size() == 1
-        assertEquals(1,cautiousConsequence.size());
+        assertEquals(1, cautiousConsequence.size());
         // ==> cautiousConsequence.contains(person);
         assertTrue(cautiousConsequence.contains(person));
 
@@ -108,11 +108,11 @@ public class TestPersonAnnotated {
         Set<Object> braveConsequence = solver.getConsequence(program, ReasoningMode.BRAVE, filter);
 
         // ==> braveConsequence.size() == 2
-        assertEquals(2,braveConsequence.size());
-        // ==> braveConsequence.contains(new Female("id42"))
-        assertTrue(braveConsequence.contains(new Female("id42")));
-        // ==> braveConsequence.contains(new Male("id42"))
-        assertTrue(braveConsequence.contains(new Male("id42")));
+        assertEquals(2, braveConsequence.size());
+        // ==> braveConsequence.contains(new PersonGender("id42", Gender.FEMALE))
+        assertTrue(braveConsequence.contains(new PersonGender("id42", Gender.FEMALE)));
+        // ==> braveConsequence.contains(new PersonGender("id42", Gender.MALE))
+        assertTrue(braveConsequence.contains(new PersonGender("id42", Gender.MALE)));
 
     }
 
@@ -135,11 +135,11 @@ public class TestPersonAnnotated {
 
         //
 
-        Filter filter = new Filter().add(Male.class).add(Female.class);
+        Filter filter = new Filter().add(PersonGender.class);
         answerSets = solver.getAnswerSets(program, filter);
 
-        Male male = new Male("id42");
-        Female female = new Female("id42");
+        PersonGender female = new PersonGender("id42", Gender.FEMALE);
+        PersonGender male = new PersonGender("id42", Gender.MALE);
 
         assertEquals(2, answerSets.size());
         as0 = answerSets.get(0).atoms();
@@ -168,24 +168,6 @@ public class TestPersonAnnotated {
         assertEquals(2, as0.size());
         assertEquals(2, as1.size());
 
-        //
-
-        filter = new Filter(Female.class);
-        answerSets = solver.getAnswerSets(program, filter);
-
-        assertEquals(2, answerSets.size());
-        as0 = answerSets.get(0).atoms();
-        as1 = answerSets.get(1).atoms();
-        assertFalse(CollectionUtils.isEqualCollection(as0, as1));
-        if (as0.isEmpty()) {
-            assertEquals(1, as1.size());
-            assertEquals(female, as1.iterator().next());
-        } else {
-            assertTrue(as1.isEmpty());
-            assertEquals(1, as0.size());
-            assertEquals(female, as0.iterator().next());
-        }
-
     }
 
     public void test_cautiouscons(Solver externalSolver, String rulefile) throws Exception {
@@ -203,7 +185,7 @@ public class TestPersonAnnotated {
 
         //
 
-        Filter filter = new Filter().add(Male.class).add(Female.class);
+        Filter filter = new Filter().add(PersonGender.class);
         cons = solver.getConsequence(program, ReasoningMode.CAUTIOUS, filter);
         assertTrue(cons.isEmpty());
 
@@ -213,12 +195,6 @@ public class TestPersonAnnotated {
         cons = solver.getConsequence(program, ReasoningMode.CAUTIOUS, filter);
         assertEquals(1, cons.size());
         assertEquals(person, cons.iterator().next());
-
-        //
-
-        filter = new Filter(Female.class);
-        cons = solver.getConsequence(program, ReasoningMode.CAUTIOUS, filter);
-        assertTrue(cons.isEmpty());
 
     }
 
@@ -237,10 +213,12 @@ public class TestPersonAnnotated {
 
         //
 
-        Filter filter = new Filter().add(Male.class).add(Female.class);
+        Filter filter = new Filter().add(PersonGender.class);
         cons = solver.getConsequence(program, ReasoningMode.BRAVE, filter);
-        Male male = new Male("id42");
-        Female female = new Female("id42");
+        
+        PersonGender female = new PersonGender("id42", Gender.FEMALE);
+        PersonGender male = new PersonGender("id42", Gender.MALE);
+
         assertEquals(2, cons.size());
         Iterator<?> it = cons.iterator();
         Object first = it.next();
@@ -258,14 +236,7 @@ public class TestPersonAnnotated {
         assertEquals(3, cons.size());
         assertTrue(cons.contains(person));
         assertTrue(cons.contains(female));
-        assertTrue(cons.contains(male));
-
-        //
-
-        filter = new Filter(Female.class);
-        cons = solver.getConsequence(program, ReasoningMode.BRAVE, filter);
-        assertEquals(1, cons.size());
-        assertEquals(female, cons.iterator().next());
+        assertTrue(cons.contains(male));        
 
     }
 }
