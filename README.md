@@ -118,13 +118,13 @@ List<AnswerSet<Object>> answerSets = solver.getAnswerSets(program, filter);
         
 Set<Object> as = answerSets.get(0).atoms();
 
-// ==> as.size() == 6, containing a Reach objects for node pairs
+// ==> as.size() == 6, containing a Reach object for each node pair of:
 // (a,b) (b,c) (c,d) (a,c) (a,d) (b,d)
 
 program = new ProgramBuilder<>(program).add(new Blocked("c")).build();
 Set<Object> cautiousCons = solver.getConsequence(program, ReasoningMode.CAUTIOUS, filter);
 Set<Object> braveCons = solver.getConsequence(program, ReasoningMode.BRAVE, filter);
 
-// ==> cautiousCons equals braveCons, size 3, with Reach objects for node pairs
+// ==> cautiousCons equals braveCons, size 3, with Reach objects for node pairs:
 // (a,b) (b,c) (a,c)
 ```
