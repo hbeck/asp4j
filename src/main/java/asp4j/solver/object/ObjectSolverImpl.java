@@ -26,42 +26,42 @@ public class ObjectSolverImpl implements ObjectSolver {
     }
 
     @Override
-    public List<AnswerSet<Object>> getAnswerSets(Program<?> program) throws SolverException {
+    public List<AnswerSet<Object>> getAnswerSets(Program<Object> program) throws SolverException {
         return Collections.unmodifiableList(computeAnswerSets(program, new Binding(), new Filter()));
     }
 
     @Override
-    public List<AnswerSet<Object>> getAnswerSets(Program<?> program, Binding binding) throws SolverException {
+    public List<AnswerSet<Object>> getAnswerSets(Program<Object> program, Binding binding) throws SolverException {
         return Collections.unmodifiableList(computeAnswerSets(program, binding, new Filter()));
     }
 
     @Override
-    public List<AnswerSet<Object>> getAnswerSets(Program<?> program, Filter filter) throws SolverException {
+    public List<AnswerSet<Object>> getAnswerSets(Program<Object> program, Filter filter) throws SolverException {
         return Collections.unmodifiableList(computeAnswerSets(program, new Binding(), filter));
     }
 
     @Override
-    public List<AnswerSet<Object>> getAnswerSets(Program<?> program, Binding binding, Filter filter) throws SolverException {
+    public List<AnswerSet<Object>> getAnswerSets(Program<Object> program, Binding binding, Filter filter) throws SolverException {
         return Collections.unmodifiableList(computeAnswerSets(program, binding, filter));
     }
 
     @Override
-    public Set<Object> getConsequence(Program<?> program, ReasoningMode mode) throws SolverException {
+    public Set<Object> getConsequence(Program<Object> program, ReasoningMode mode) throws SolverException {
         return getConsequence(program, mode, new Binding(), new Filter());
     }
 
     @Override
-    public Set<Object> getConsequence(Program<?> program, ReasoningMode mode, Binding binding) throws SolverException {
+    public Set<Object> getConsequence(Program<Object> program, ReasoningMode mode, Binding binding) throws SolverException {
         return getConsequence(program, mode, binding, new Filter());
     }
 
     @Override
-    public Set<Object> getConsequence(Program<?> program, ReasoningMode mode, Filter filter) throws SolverException {
+    public Set<Object> getConsequence(Program<Object> program, ReasoningMode mode, Filter filter) throws SolverException {
         return getConsequence(program, mode, new Binding(), filter);
     }
 
     @Override
-    public Set<Object> getConsequence(Program<?> program, ReasoningMode mode, Binding binding, Filter filter) throws SolverException {
+    public Set<Object> getConsequence(Program<Object> program, ReasoningMode mode, Binding binding, Filter filter) throws SolverException {
         Program<Atom> atomProgram = getAtomProgram(program, binding, filter);
         Set<Atom> atoms = solver.getConsequence(atomProgram, mode);
         try {
@@ -71,7 +71,7 @@ public class ObjectSolverImpl implements ObjectSolver {
         }
     }
 
-    private List<AnswerSet<Object>> computeAnswerSets(Program<?> program, Binding binding, Filter filter) throws SolverException {
+    private List<AnswerSet<Object>> computeAnswerSets(Program<Object> program, Binding binding, Filter filter) throws SolverException {
         Program<Atom> atomProgram = getAtomProgram(program, binding, filter);
         List<AnswerSet<Atom>> answerSets = solver.getAnswerSets(atomProgram);
         try {
@@ -81,7 +81,7 @@ public class ObjectSolverImpl implements ObjectSolver {
         }
     }
 
-    private Program<Atom> getAtomProgram(Program<?> program, Binding binding, Filter filter) throws SolverException {
+    private Program<Atom> getAtomProgram(Program<Object> program, Binding binding, Filter filter) throws SolverException {
         prepareIO(program, binding, filter);
         ProgramBuilder<Atom> builder = new ProgramBuilder<>();
         builder.addFiles(program.getFiles());
@@ -95,7 +95,7 @@ public class ObjectSolverImpl implements ObjectSolver {
         return builder.build();
     }
 
-    private void prepareIO(Program<?> program, Binding binding, Filter filter) throws SolverException {
+    private void prepareIO(Program<Object> program, Binding binding, Filter filter) throws SolverException {
         Set<Class<?>> inputClasses = new HashSet<>();
         for (Object object : program.getInput()) {
             inputClasses.add(object.getClass());

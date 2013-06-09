@@ -56,8 +56,8 @@ public class PersonGender {
 @DefEnumConstants
 public enum Gender {
     
-    @MapWith("female") FEMALE,
-    @MapWith("male") MALE    
+    @MapAs("female") FEMALE,
+    @MapAs("male") MALE    
 
 }
 ```

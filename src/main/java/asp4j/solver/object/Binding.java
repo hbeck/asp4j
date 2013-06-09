@@ -54,14 +54,8 @@ public class Binding {
     /**
      * add explicit mapping for given class.
      *
-     * @param <T>
-     * @param <E>
-     * @param clazz
-     * @param mapping
-     * @return
-     *
      */
-    public <T, E extends LangElem> Binding add(final Class<T> clazz, AnyMapping<T, E> mapping) {
+    public <T, E extends LangElem> Binding add(Class<T> clazz, AnyMapping<T, E> mapping) {
         registry.add(clazz, mapping);
         return this;
     }
@@ -69,22 +63,14 @@ public class Binding {
     /**
      * add implicit mapping for given class. mapping is derived by annotations
      * of this class.
-     *
-     * @param <T>
-     * @param clazz
-     * @return
-     *
+
      */
-    public <T> Binding add(final Class<T> clazz) throws MappingException {
+    public <T> Binding add(Class<T> clazz) throws MappingException {
         registry.add(clazz);
         return this;
     }
 
     /**
-     * @see add(Class<?> class)
-     * @param classes
-     * @return
-     *
      */
     public Binding addAll(Collection<Class<?>> classes) throws MappingException {
         for (Class<?> clazz : classes) {
@@ -106,7 +92,7 @@ public class Binding {
         return mapping.asObject(e);
     }
 
-    protected <T, E extends LangElem> T mapAsObject(E e, Class<? extends T> clazz) throws MappingException {
+    protected <T, E extends LangElem> T mapAsObject(E e, Class<T> clazz) throws MappingException {
         OutputMapping<T, E> mapping = (OutputMapping<T, E>) registry.getOutputMapping(clazz);
         return mapping.asObject(e);
     }
@@ -169,11 +155,11 @@ public class Binding {
             return inputMappings.containsKey(clazz) || outputMappings.containsKey(clazz);
         }
 
-        private <T, E extends LangElem> void addInputMapping(Class<? extends T> clazz, InputMapping<T, E> mapping) {
+        private <T, E extends LangElem> void addInputMapping(Class<T> clazz, InputMapping<T, E> mapping) {
             inputMappings.put(clazz, mapping);
         }
 
-        private <T, E extends LangElem> void addOutputMapping(Class<? extends T> clazz, OutputMapping<T, E> mapping) {
+        private <T, E extends LangElem> void addOutputMapping(Class<T> clazz, OutputMapping<T, E> mapping) {
             outputMappings.put(clazz, mapping);
             if (clazz.isEnum()) {
                 HasTargetNames enumMapping = (HasTargetNames) mapping;
@@ -193,7 +179,7 @@ public class Binding {
          * @param clazz
          * @param mapping
          */
-        private <T, E extends LangElem> void add(Class<? extends T> clazz, AnyMapping<T, E> mapping) {
+        private <T, E extends LangElem> void add(Class<T> clazz, AnyMapping<T, E> mapping) {
             if (isRegistered(clazz)) {
                 return;
             }
@@ -207,13 +193,8 @@ public class Binding {
 
         /**
          * add implicit mapping to be generated from annotations
-         *
-         * @param <T>
-         * @param <E>
-         * @param clazz
-         *
          */
-        private void add(final Class<?> clazz) throws MappingException {
+        private void add(Class<?> clazz) throws MappingException {
             if (isRegistered(clazz)) {
                 return;
             }
@@ -224,7 +205,7 @@ public class Binding {
             }
         }
 
-        private void addEnum(final Class clazz) {
+        private void addEnum(Class clazz) {
             Mapping<?, ?> mapping;
             if (clazz.isAnnotationPresent(DefEnumAtoms.class)) {
                 mapping = new AtomEnumMapping(clazz);
@@ -237,7 +218,7 @@ public class Binding {
             addOutputMapping(clazz, (OutputMapping<?, ?>) mapping);
         }
 
-        private <T, E extends LangElem> void addAnnotatedClass(final Class<T> clazz) throws MappingException {
+        private <T, E extends LangElem> void addAnnotatedClass(Class<T> clazz) throws MappingException {
             AnyMapping<T, ?> mapping;
             if (clazz.isAnnotationPresent(DefAtom.class)) {
                 mapping = createAtomMapping(clazz);
@@ -275,7 +256,7 @@ public class Binding {
             return classes;
         }
 
-        private <T, E extends LangElem> InputMapping<T, E> getInputMapping(Class<? extends T> clazz) throws MappingException {
+        private <T, E extends LangElem> InputMapping<T, E> getInputMapping(Class<T> clazz) throws MappingException {
             InputMapping<?, ?> mapping = inputMappings.get(clazz);
             if (mapping != null) {
                 return (InputMapping<T, E>) mapping;
@@ -290,19 +271,19 @@ public class Binding {
         }
 
         private <T, E extends LangElem> OutputMapping<T, E> getOutputMapping(E e) throws MappingException {
-            Class<? extends T> clazz = (Class<? extends T>) symbol2class.get(e.symbol());
+            Class<T> clazz = (Class<T>) symbol2class.get(e.symbol());
             return getOutputMapping(clazz);
         }
 
-        private <T, E extends LangElem> OutputMapping<T, E> getOutputMapping(Class<? extends T> clazz) throws MappingException {
+        private <T, E extends LangElem> OutputMapping<T,E> getOutputMapping(Class<T> clazz) throws MappingException {
             OutputMapping<?, ?> mapping = outputMappings.get(clazz);
             if (mapping != null) {
-                return (OutputMapping<T, E>) mapping;
+                return (OutputMapping<T,E>) mapping;
             }
             for (Class<?> candidateClass : clazz.getInterfaces()) {
                 mapping = outputMappings.get(candidateClass);
                 if (mapping != null) {
-                    return (OutputMapping<T, E>) mapping;
+                    return (OutputMapping<T,E>) mapping;
                 }
             }
             throw new MappingException("no output mapping found for " + clazz);
