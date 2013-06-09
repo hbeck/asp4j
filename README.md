@@ -2,64 +2,96 @@
 
 Answer Set Programming solver interface for Java
 
-Version 0.0.5-SNAPSHOT. June 9, 2013
+Version 0.0.5. June 9, 2013
 
 ## Example
 
-#### Logic program `person.lp`
+#### Logic program `reach.lp`
 
-    gender(X,female) :- person(X), not gender(X,male).
-    gender(X,male)   :- person(X), not gender(X,female).
+    reach(X,Y) :- edge(X,Y), not blocked(X).
+    reach(X,Z) :- reach(X,Y), reach(Y,Z).
 
 #### Java classes (beans)
   
-```java  
-@DefAtom("person")
-public class Person {
+```java
+@DefAtom("edge")
+public class Edge {
     
-    private String id;
-    
-    public Person() {
-    }
-    
-    public Person(String id) {
-        this.id=id;
-    }
-    
-    @Arg(0)
-    public String getId() {
-        return id;
+    private Node from;
+    private Node to;
+
+    public Edge() {
     }
 
-    //setter, hashCode, equals ...
-}
-
-@DefAtom("gender")
-public class PersonGender {    
-    
-    private String id;
-    private Gender gender;
+    // other constructors ...
     
     @Arg(0)
-    public String getId() {
-        return id;
+    public Node getFrom() {
+        return from;
+    }
+
+    public void setFrom(Node from) {
+        this.from = from;
     }
 
     @Arg(1)
-    public Gender getGender() {
-        return gender;
+    public Node getTo() {
+        return to;
     }
 
-    //constructors, setter, hashCode, equals ...
+    public void setTo(Node to) {
+        this.to = to;
+    }
+
+    // hashCode, equals, ...
+
 }
 
-@DefEnumConstants
-public enum Gender {
+@DefTerm("node")
+public class Node {
+
+    @Arg(0)
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    //...
+}
+
+@DefAtom("reach")
+public class Reach {
+
+    //like class Edge ...
     
-    @MapAs("female") FEMALE,
-    @MapAs("male") MALE    
-
 }
+
+@DefAtom("blocked")
+public class Blocked {
+    
+    private Node node;
+
+    public Blocked() {
+    }
+
+    // ...
+    
+    @Arg(0)
+    public Node getNode() {
+        return node;
+    }
+
+    public void setNode(Node node) {
+        this.node = node;
+    }
+
+    // ...
+}
+
+
 ```
 
 #### Using a solver
@@ -68,28 +100,31 @@ public enum Gender {
 - [clingo](http://potassco.sourceforge.net/)
 
 ```java
-Person person = new Person("id42");
+Edge edge_ab = new Edge("a", "b");
+Edge edge_bc = new Edge("b", "c");
+Edge edge_cd = new Edge("c", "d");
 
 ObjectSolver solver = new ObjectSolverImpl(externalSolver);
-Program<Object> program = new ProgramBuilder().add(new File(rulefile)).add(person).build();
-Filter filter = new Filter().add(PersonGender.class);
-        
+Program<Object> program = new ProgramBuilder<>()
+    .add(new File(rulefile))
+    .add(edge_ab).add(edge_bc).add(edge_cd)
+    .build();
+
+Filter filter = new Filter().add(Reach.class);
+
 List<AnswerSet<Object>> answerSets = solver.getAnswerSets(program, filter);
 
-// ==> answerSets.size() == 2
+// ==> answerSets.size() == 1
+        
+Set<Object> as = answerSets.get(0).atoms();
 
-Set<Object> cautiousConsequence = solver.getConsequence(program, ReasoningMode.CAUTIOUS);
+// ==> as.size() == 6, containing a Reach objects for node pairs
+// (a,b) (b,c) (c,d) (a,c) (a,d) (b,d)
 
-// ==> cautiousConsequence.size() == 1
-// ==> cautiousConsequence.contains(person);
+program = new ProgramBuilder<>(program).add(new Blocked("c")).build();
+Set<Object> cautiousCons = solver.getConsequence(program, ReasoningMode.CAUTIOUS, filter);
+Set<Object> braveCons = solver.getConsequence(program, ReasoningMode.BRAVE, filter);
 
-cautiousConsequence = solver.getConsequence(program, ReasoningMode.CAUTIOUS, filter);
-
-// ==> cautiousConsequence.isEmpty()
-
-Set<Object> braveConsequence = solver.getConsequence(program, ReasoningMode.BRAVE, filter);
-
-// ==> braveConsequence.size() == 2
-// ==> braveConsequence.contains(new PersonGender("id42", Gender.FEMALE))
-// ==> braveConsequence.contains(new PersonGender("id42", Gender.MALE))
+// ==> cautiousCons equals braveCons, size 3, with Reach objects for node pairs
+// (a,b) (b,c) (a,c)
 ```

@@ -1,7 +1,7 @@
 package asp4j.test.person.uri;
 
-import asp4j.mapping.URIMapping;
 import asp4j.lang.AnswerSet;
+import asp4j.mapping.URIMapping;
 import asp4j.program.Program;
 import asp4j.program.ProgramBuilder;
 import asp4j.solver.ReasoningMode;
