@@ -88,34 +88,56 @@ public class TestGender {
         test_bravecons(new SolverClingo(), rulefile_common);
     }
 
-    //@Test TODO
-    public void test_query_1_dlv() throws Exception {
-        test_query1(new SolverDLV(), rulefile_dlv);
-        test_query1(new SolverDLV(), rulefile_common);
+    @Test
+    public void test_query_1_atom_dlv() throws Exception {
+        test_query1_atom(new SolverDLV(), rulefile_dlv);
+        test_query1_atom(new SolverDLV(), rulefile_common);
     }
 
     //@Test TODO
-    public void test_query_2_dlv() throws Exception {
-        test_query2(new SolverDLV(), rulefile_dlv);
-        test_query2(new SolverDLV(), rulefile_common);
+    public void test_query_1_object_dlv() throws Exception {
+        test_query1_object(new SolverDLV(), rulefile_dlv);
+        test_query1_object(new SolverDLV(), rulefile_common);
+    }
+
+    //@Test
+    public void test_query_2_atom_dlv() throws Exception {
+        test_query2_atom(new SolverDLV(), rulefile_dlv);
+        test_query2_atom(new SolverDLV(), rulefile_common);
     }
 
     //@Test TODO
-    public void test_query_7_dlv() throws Exception {
-        test_query7(new SolverDLV(), rulefile_dlv);
-        test_query7(new SolverDLV(), rulefile_common);
+    public void test_query_2_object_dlv() throws Exception {
+        test_query2_object(new SolverDLV(), rulefile_dlv);
+        test_query2_object(new SolverDLV(), rulefile_common);
     }
 
+    @Test
+    public void test_query_7_atom_dlv() throws Exception {
+        test_query7_atom(new SolverDLV(), rulefile_dlv);
+        test_query7_atom(new SolverDLV(), rulefile_common);
+    }
+    
+    //@Test TODO
+    public void test_query_7_object_dlv() throws Exception {
+        test_query7_object(new SolverDLV(), rulefile_dlv);
+        test_query7_object(new SolverDLV(), rulefile_common);
+    }
+
+    //@Test TODO
+    public void test_query_16_atom_dlv() throws Exception {
+        test_query16_atom(new SolverDLV(), rulefile_dlv);
+        test_query16_atom(new SolverDLV(), rulefile_common);
+    }
+    
     //@Test TODO
     public void test_query_16_dlv() throws Exception {
-        test_query16(new SolverDLV(), rulefile_dlv);
-        test_query16(new SolverDLV(), rulefile_common);
+        test_query16_object(new SolverDLV(), rulefile_dlv);
+        test_query16_object(new SolverDLV(), rulefile_common);
     }
 
     //TODO clingo first
-    
     //TODO ...then other test cases
-    
     /*
      * RULES (common; dlv and clingo similar)
      * 
@@ -307,7 +329,7 @@ public class TestGender {
      * person(id42)? --> cautiously TRUE / bravely TRUE
      * 
      */
-    public void test_query1(Solver externalSolver, String rulefile) throws Exception {
+    public void test_query1_atom(Solver externalSolver, String rulefile) throws Exception {
 
         Atom personAtom = ParseUtils.parseAtom("person(id42)");
         Program<Atom> externalProgram = new ProgramBuilder<Atom>().add(new File(rulefile)).add(personAtom).build();
@@ -321,7 +343,13 @@ public class TestGender {
         b = externalSolver.booleanQuery(externalProgram, query, ReasoningMode.BRAVE);
         assertTrue(b);
 
-        //
+    }
+
+    public void test_query1_object(Solver externalSolver, String rulefile) throws Exception {
+
+        boolean b;
+
+        BooleanQuery query = new BooleanQueryImpl("person(id42)?");
 
         Person person = new Person("id42");
 
@@ -344,14 +372,14 @@ public class TestGender {
             assertTrue(b);
 
         }
-
     }
+
 
     /* 
      * QUERY 2:
      * person(X)? --> id42 / id42
      */
-    public void test_query2(Solver externalSolver, String rulefile) throws Exception {
+    public void test_query2_atom(Solver externalSolver, String rulefile) throws Exception {
 
         Atom personAtom = ParseUtils.parseAtom("person(id42)");
         Program<Atom> externalProgram = new ProgramBuilder<Atom>().add(new File(rulefile)).add(personAtom).build();
@@ -364,6 +392,13 @@ public class TestGender {
         test_query2_sub1(result);
         result = externalSolver.tupleQuery(externalProgram, query, ReasoningMode.BRAVE);
         test_query2_sub1(result);
+
+    }
+
+    public void test_query2_object(Solver externalSolver, String rulefile) throws Exception {
+
+        TupleQuery query = new TupleQueryImpl("person(X)?");
+        TupleQueryResult result;
 
         //
 
@@ -431,19 +466,25 @@ public class TestGender {
      * QUERY 7:
      * person(id42), gender(id42,female)? --> FALSE / TRUE
      */
-    public void test_query7(Solver externalSolver, String rulefile) throws Exception {
+    public void test_query7_atom(Solver externalSolver, String rulefile) throws Exception {
 
         Atom personAtom = ParseUtils.parseAtom("person(id42)");
         Program<Atom> externalProgram = new ProgramBuilder<Atom>().add(new File(rulefile)).add(personAtom).build();
 
         boolean b;
-
         BooleanQuery query = new BooleanQueryImpl("person(id42), gender(id42,female)?");
 
         b = externalSolver.booleanQuery(externalProgram, query, ReasoningMode.CAUTIOUS);
         assertFalse(b);
         b = externalSolver.booleanQuery(externalProgram, query, ReasoningMode.BRAVE);
         assertTrue(b);
+
+    }
+
+    public void test_query7_object(Solver externalSolver, String rulefile) throws Exception {
+
+        boolean b;
+        BooleanQuery query = new BooleanQueryImpl("person(id42), gender(id42,female)?");
 
         //
 
@@ -467,7 +508,6 @@ public class TestGender {
             assertFalse(b);
             b = solver.booleanQuery(program, obQuery, ReasoningMode.BRAVE);
             assertTrue(b);
-
         }
 
     }
@@ -476,7 +516,7 @@ public class TestGender {
      * QUERY 16:
      * person(X), gender(Y,Z) ? --> -- / id42, id42, female; id42, id42, male
      */
-    public void test_query16(Solver externalSolver, String rulefile) throws Exception {
+    public void test_query16_atom(Solver externalSolver, String rulefile) throws Exception {
 
         Atom personAtom = ParseUtils.parseAtom("person(id42)");
         Program<Atom> externalProgram = new ProgramBuilder<Atom>().add(new File(rulefile)).add(personAtom).build();
@@ -492,6 +532,12 @@ public class TestGender {
         result = externalSolver.tupleQuery(externalProgram, query, ReasoningMode.BRAVE);
         test_query16_sub1_brave(result);
 
+    }
+
+    public void test_query16_object(Solver externalSolver, String rulefile) throws Exception {
+
+        TupleQuery query = new TupleQueryImpl("person(X0), gender(X1,X2)?");
+        TupleQueryResult result;
         //
 
         //note: getters returning null => variables.
@@ -561,16 +607,20 @@ public class TestGender {
             String symbol = x2.symbol();
             Constant female = new ConstantImpl("female");
             Constant male = new ConstantImpl("male");
-            if ("female".equals(symbol)) {
-                assertEquals(female, x2);
-                assertEquals(female, boundX2);
-                checkFemale = true;
-            } else if ("mail".equals(symbol)) {
-                assertEquals(male, x2);
-                assertEquals(male, boundX2);
-                checkMale = true;
-            } else {
-                fail();
+            switch (symbol) {
+                case "female":
+                    assertEquals(female, x2);
+                    assertEquals(female, boundX2);
+                    checkFemale = true;
+                    break;
+                case "male":
+                    assertEquals(male, x2);
+                    assertEquals(male, boundX2);
+                    checkMale = true;
+                    break;
+                default:
+                    fail();
+                    break;
             }
         }
         assertTrue(checkFemale);

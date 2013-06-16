@@ -45,5 +45,10 @@ public class SolverClingo extends SolverBase {
     protected String atomDelimiter() {
         return " ";
     }
+
+    @Override
+    protected boolean getBooleanQueryResult(Process exec) throws IOException {
+        throw new UnsupportedOperationException("Not supported yet."); //TODO
+    }
     
 }

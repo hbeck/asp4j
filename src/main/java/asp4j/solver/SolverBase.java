@@ -4,9 +4,9 @@ import asp4j.lang.AnswerSet;
 import asp4j.lang.AnswerSetImpl;
 import asp4j.lang.Atom;
 import asp4j.program.Program;
-import asp4j.solver.call.SolverCall;
 import asp4j.solver.call.AnswerSetsSolverCall;
 import asp4j.solver.call.QuerySolverCall;
+import asp4j.solver.call.SolverCall;
 import asp4j.solver.query.BooleanQuery;
 import asp4j.solver.query.Query;
 import asp4j.solver.query.TupleQuery;
@@ -29,6 +29,8 @@ public abstract class SolverBase implements Solver {
 
     protected int lastProgramHashCode;
     protected List<AnswerSet<Atom>> lastProgramAnswerSets;
+//    protected Boolean lastBooleanQuery;
+//    protected int lastBooleanQueryHashCode;
 
     public SolverBase() {
         lastProgramAnswerSets = null;
@@ -36,11 +38,12 @@ public abstract class SolverBase implements Solver {
 
     @Override
     public List<AnswerSet<Atom>> getAnswerSets(Program<Atom> program) throws SolverException {
-        if (lastProgramAnswerSets != null && program.hashCode() == lastProgramHashCode) {
-            return lastProgramAnswerSets;
-        }
-        lastProgramHashCode = program.hashCode();
         try {
+            if (lastProgramAnswerSets != null && program.hashCode() == lastProgramHashCode) {
+                return lastProgramAnswerSets;
+            }
+            lastProgramHashCode = program.hashCode();
+            //
             SolverCall solverCall = getAnswerSetsSolverCall(program);
             Process exec = Runtime.getRuntime().exec(solverCall.create());
             List<String> answerSetStrings = getAnswerSetStrings(exec);
@@ -65,15 +68,21 @@ public abstract class SolverBase implements Solver {
 
     @Override
     public boolean booleanQuery(Program<Atom> program, BooleanQuery query, ReasoningMode reasoningMode) throws SolverException {
-        throw new UnsupportedOperationException("Not supported yet."); //TODO
+        try {
+            SolverCall solverCall = getQuerySolverCall(program, query, reasoningMode);
+            Process exec = Runtime.getRuntime().exec(solverCall.create());
+            return getBooleanQueryResult(exec);
+        } catch (IOException | ParseException e) {
+            throw new SolverException(e);
+        }
     }
 
     @Override
     public TupleQueryResult tupleQuery(Program<Atom> program, TupleQuery query, ReasoningMode reasoningMode) throws SolverException {
         throw new UnsupportedOperationException("Not supported yet."); //TODO
     }
-
-    protected AnswerSetsSolverCall getAnswerSetsSolverCall(Program<Atom> program) {
+    
+    private SolverCall getAnswerSetsSolverCall(Program<Atom> program) {
         return new AnswerSetsSolverCall(program) {
             @Override
             public String getSolverCommand() {
@@ -82,8 +91,8 @@ public abstract class SolverBase implements Solver {
         };
     }
 
-    protected QuerySolverCall getQuerySolverCall(Program<Atom> program, Query query, final ReasoningMode reasoningMode) {
-        return new QuerySolverCall(program, query){
+    private SolverCall getQuerySolverCall(Program<Atom> program, Query query, final ReasoningMode reasoningMode) {
+        return new QuerySolverCall(program, query) {
             @Override
             public String getSolverCommand() {
                 return querySolverCommand(reasoningMode);
@@ -104,6 +113,8 @@ public abstract class SolverBase implements Solver {
      * @return list of strings, each representing an answer set
      */
     protected abstract List<String> getAnswerSetStrings(Process exec) throws IOException;
+    
+    protected abstract boolean getBooleanQueryResult(Process exec) throws IOException, ParseException;
 
     /**
      * prepare answer set string for tokenization. e.g. surrounding braces may

@@ -1,6 +1,6 @@
 0.0.6
 
-- query support
+- boolean queries
 
 0.0.5 2013-06-09
 

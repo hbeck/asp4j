@@ -11,6 +11,6 @@ public abstract class AnswerSetsSolverCall extends SolverCallBase {
     
     public AnswerSetsSolverCall(Program<Atom> program) {
         super(program);
-    }   
+    }    
     
 }
