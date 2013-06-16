@@ -1,10 +1,5 @@
 package asp4j.solver;
 
-import asp4j.lang.Atom;
-import asp4j.program.Program;
-import asp4j.solver.query.BooleanQuery;
-import asp4j.solver.query.TupleQuery;
-import asp4j.solver.query.TupleQueryResult;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -13,13 +8,28 @@ import org.apache.commons.io.IOUtils;
 
 /**
  *
- * @author hbeck  Apr 14, 2013
+ * @author hbeck Apr 14, 2013
  */
 public class SolverDLV extends SolverBase {
 
     @Override
-    protected String solverCommand() {
+    protected String answerSetsSolverCommand() {
         return "dlv -silent";
+    }
+
+    @Override
+    protected String querySolverCommand(ReasoningMode reasoningMode) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(answerSetsSolverCommand());
+        switch (reasoningMode) {
+            case BRAVE:
+                sb.append(" -brave");
+                break;
+            case CAUTIOUS:
+                sb.append(" -cautious");
+                break;
+        }
+        return sb.toString();
     }
 
     @Override
@@ -32,7 +42,7 @@ public class SolverDLV extends SolverBase {
         List<String> answerSetLines = new ArrayList<>();
         for (String line : allLines) {
             if (!line.startsWith("{")) {
-                throw new IOException("dlv output error: not an answer set: "+line);
+                throw new IOException("dlv output error: not an answer set: " + line);
             }
             answerSetLines.add(line);
         }
@@ -40,7 +50,7 @@ public class SolverDLV extends SolverBase {
     }
 
     /**
-     * 
+     *
      * @param answerSetString "{atom_1,...,atom_n}"
      * @return "atom_1,...,atom_n"
      */
@@ -53,5 +63,4 @@ public class SolverDLV extends SolverBase {
     protected String atomDelimiter() {
         return ", ";
     }
-
 }

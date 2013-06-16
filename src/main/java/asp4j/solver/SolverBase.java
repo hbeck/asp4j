@@ -3,22 +3,23 @@ package asp4j.solver;
 import asp4j.lang.AnswerSet;
 import asp4j.lang.AnswerSetImpl;
 import asp4j.lang.Atom;
-import asp4j.util.ParseUtils;
 import asp4j.program.Program;
+import asp4j.solver.call.SolverCall;
+import asp4j.solver.call.AnswerSetsSolverCall;
+import asp4j.solver.call.QuerySolverCall;
 import asp4j.solver.query.BooleanQuery;
+import asp4j.solver.query.Query;
 import asp4j.solver.query.TupleQuery;
 import asp4j.solver.query.TupleQueryResult;
-import java.io.File;
+import asp4j.util.ParseUtils;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import org.apache.commons.io.FileUtils;
 
 /**
  *
@@ -26,13 +27,68 @@ import org.apache.commons.io.FileUtils;
  */
 public abstract class SolverBase implements Solver {
 
-    protected File inputFile;
     protected int lastProgramHashCode;
     protected List<AnswerSet<Atom>> lastProgramAnswerSets;
 
     public SolverBase() {
-        inputFile = null;
         lastProgramAnswerSets = null;
+    }
+
+    @Override
+    public List<AnswerSet<Atom>> getAnswerSets(Program<Atom> program) throws SolverException {
+        if (lastProgramAnswerSets != null && program.hashCode() == lastProgramHashCode) {
+            return lastProgramAnswerSets;
+        }
+        lastProgramHashCode = program.hashCode();
+        try {
+            SolverCall solverCall = getAnswerSetsSolverCall(program);
+            Process exec = Runtime.getRuntime().exec(solverCall.create());
+            List<String> answerSetStrings = getAnswerSetStrings(exec);
+            return lastProgramAnswerSets = Collections.unmodifiableList(mapAnswerSetStrings(answerSetStrings));
+        } catch (IOException | ParseException e) {
+            throw new SolverException(e);
+        }
+    }
+
+    @Override
+    public Set<Atom> getConsequence(Program<Atom> program, ReasoningMode mode) throws SolverException {
+        List<AnswerSet<Atom>> as = getAnswerSets(program);
+        switch (mode) {
+            case BRAVE:
+                return braveConsequence(as);
+            case CAUTIOUS:
+                return cautiousConsequence(as);
+            default:
+                return null;
+        }
+    }
+
+    @Override
+    public boolean booleanQuery(Program<Atom> program, BooleanQuery query, ReasoningMode reasoningMode) throws SolverException {
+        throw new UnsupportedOperationException("Not supported yet."); //TODO
+    }
+
+    @Override
+    public TupleQueryResult tupleQuery(Program<Atom> program, TupleQuery query, ReasoningMode reasoningMode) throws SolverException {
+        throw new UnsupportedOperationException("Not supported yet."); //TODO
+    }
+
+    protected AnswerSetsSolverCall getAnswerSetsSolverCall(Program<Atom> program) {
+        return new AnswerSetsSolverCall(program) {
+            @Override
+            public String getSolverCommand() {
+                return answerSetsSolverCommand();
+            }
+        };
+    }
+
+    protected QuerySolverCall getQuerySolverCall(Program<Atom> program, Query query, final ReasoningMode reasoningMode) {
+        return new QuerySolverCall(program, query){
+            @Override
+            public String getSolverCommand() {
+                return querySolverCommand(reasoningMode);
+            }
+        };
     }
 
     /**
@@ -40,7 +96,9 @@ public abstract class SolverBase implements Solver {
      *
      * @return part before list of files
      */
-    protected abstract String solverCommand();
+    protected abstract String answerSetsSolverCommand();
+
+    protected abstract String querySolverCommand(ReasoningMode reasoningMode);
 
     /**
      * @return list of strings, each representing an answer set
@@ -69,23 +127,6 @@ public abstract class SolverBase implements Solver {
         lastProgramAnswerSets = null;
     }
 
-    @Override
-    public List<AnswerSet<Atom>> getAnswerSets(Program<Atom> program) throws SolverException {
-        if (lastProgramAnswerSets != null && program.hashCode() == lastProgramHashCode) {
-            return lastProgramAnswerSets;
-        }
-        lastProgramHashCode = program.hashCode();
-        preSolverExec(program);
-        try {
-            Process exec = Runtime.getRuntime().exec(solverCallString(program));
-            List<String> answerSetStrings = getAnswerSetStrings(exec);
-            postSolverExec(program);
-            return lastProgramAnswerSets = Collections.unmodifiableList(mapAnswerSetStrings(answerSetStrings));
-        } catch (IOException | ParseException e) {
-            throw new SolverException(e);
-        }
-    }
-
     /**
      * maps a list of answer sets, represented as strings, to a list of (low
      * level) AnswerSet objects
@@ -102,19 +143,6 @@ public abstract class SolverBase implements Solver {
             answerSets.add(new AnswerSetImpl<>(atoms));
         }
         return answerSets;
-    }
-
-    @Override
-    public Set<Atom> getConsequence(Program<Atom> program, ReasoningMode mode) throws SolverException {
-        List<AnswerSet<Atom>> as = getAnswerSets(program);
-        switch (mode) {
-            case BRAVE:
-                return braveConsequence(as);
-            case CAUTIOUS:
-                return cautiousConsequence(as);
-            default:
-                return null;
-        }
     }
 
     protected Set<Atom> cautiousConsequence(List<AnswerSet<Atom>> answerSets) {
@@ -135,66 +163,5 @@ public abstract class SolverBase implements Solver {
             set.addAll(answerSet.atoms());
         }
         return Collections.unmodifiableSet(set);
-    }
-
-    /**
-     *
-     * @param program
-     * @return full call to solver, i.e., solver command plus programs
-     * @throws IOException
-     */
-    protected String solverCallString(Program<Atom> program) throws IOException {
-        StringBuilder sb = new StringBuilder();
-        sb.append(solverCommand());
-        for (File file : program.getFiles()) {
-            sb.append(" ").append(file.getAbsolutePath());
-        }
-        if (!program.getInput().isEmpty()) {
-            sb.append(" ").append(inputFile.getAbsolutePath());
-        }
-        return sb.toString();
-    }
-
-    protected File tempInputFile() throws IOException {
-        if (inputFile == null) {
-            inputFile = File.createTempFile("asp4j-tmp-prog-", ".lp");
-            inputFile.deleteOnExit();
-        }
-        return inputFile;
-    }
-
-    /**
-     * executed before call to solver
-     */
-    protected void preSolverExec(Program<Atom> program) throws SolverException {
-        Collection<Atom> inputAtoms = program.getInput();
-        if (inputAtoms.isEmpty()) {
-            return;
-        }
-        StringBuilder sb = new StringBuilder();
-        for (Atom atom : inputAtoms) {
-            sb.append(atom.toString());
-        }
-        try {
-            FileUtils.writeStringToFile(tempInputFile(), sb.toString());
-        } catch (IOException ex) {
-            throw new SolverException(ex);
-        }
-    }
-
-    /**
-     * executed after call to solver
-     */
-    protected void postSolverExec(Program<Atom> program) {
-    }
-
-    @Override
-    public boolean booleanQuery(Program<Atom> program, BooleanQuery query, ReasoningMode reasoningMode) {
-        throw new UnsupportedOperationException("Not supported yet."); //TODO
-    }
-
-    @Override
-    public TupleQueryResult tupleQuery(Program<Atom> program, TupleQuery query, ReasoningMode reasoningMode) {
-        throw new UnsupportedOperationException("Not supported yet."); //TODO
     }
 }

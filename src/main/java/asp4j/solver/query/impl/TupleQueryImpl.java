@@ -8,8 +8,16 @@ import asp4j.solver.query.TupleQuery;
  */
 public class TupleQueryImpl implements TupleQuery {
     
+    protected String queryString;
+
     public TupleQueryImpl(String queryString) {
-        throw new UnsupportedOperationException("TODO");                
+        this.queryString = queryString;
     }
+
+    @Override
+    public String asString() {
+        return queryString;
+    }
+    
 
 }

@@ -11,8 +11,8 @@ import java.util.Set;
 
 /**
  *
- * @author hbeck 
- *  2013-04-14
+ * @author hbeck Apr 14, 2013
+ *
  */
 public interface Solver {
     
@@ -35,8 +35,8 @@ public interface Solver {
      */
     Set<Atom> getConsequence(Program<Atom> program, ReasoningMode mode) throws SolverException;    
 
-    boolean booleanQuery(Program<Atom> program, BooleanQuery query, ReasoningMode reasoningMode);
+    boolean booleanQuery(Program<Atom> program, BooleanQuery query, ReasoningMode reasoningMode) throws SolverException;
 
-    TupleQueryResult tupleQuery(Program<Atom> program, TupleQuery query, ReasoningMode reasoningMode);
-    
+    TupleQueryResult tupleQuery(Program<Atom> program, TupleQuery query, ReasoningMode reasoningMode) throws SolverException;
+
 }

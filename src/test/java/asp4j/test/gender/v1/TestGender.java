@@ -112,7 +112,9 @@ public class TestGender {
         test_query16(new SolverDLV(), rulefile_common);
     }
 
-    //TODO clingo
+    //TODO clingo first
+    
+    //TODO ...then other test cases
     
     /*
      * RULES (common; dlv and clingo similar)

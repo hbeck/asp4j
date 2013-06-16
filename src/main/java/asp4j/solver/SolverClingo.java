@@ -8,13 +8,18 @@ import org.apache.commons.io.IOUtils;
 
 /**
  *
- * @author hbeck  May 27, 2013
+ * @author hbeck May 27, 2013
  */
 public class SolverClingo extends SolverBase {
 
     @Override
-    protected String solverCommand() {
+    protected String answerSetsSolverCommand() {
         return "clingo 0 --verbose=0";
+    }
+
+    @Override
+    protected String querySolverCommand(ReasoningMode reasoningMode) {
+        throw new UnsupportedOperationException("Not supported yet."); //TODO
     }
 
     @Override
@@ -40,4 +45,5 @@ public class SolverClingo extends SolverBase {
     protected String atomDelimiter() {
         return " ";
     }
+    
 }
