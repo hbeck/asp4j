@@ -1,34 +1,22 @@
-package asp4j.test.person;
+package asp4j.test.person.str;
 
-import asp4j.mapping.annotations.Arg;
 import asp4j.mapping.annotations.DefAtom;
 import java.util.Objects;
 
 /**
  *
- * @author hbeck
+ * @author hbeck 
  * date May 23, 2013
  */
-@DefAtom("person")
-public class Person {
+@DefAtom("female")
+public class Female extends Person {
 
-    protected String id;
-
-    public Person() {
+    public Female() {
     }
 
-    public Person(String id) {
-        this.id = id;
+    public Female(String id) {
+        super(id);
     }
-
-    @Arg(0)
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }    
 
     @Override
     public int hashCode() {
@@ -45,7 +33,7 @@ public class Person {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        final Person other = (Person) obj;
+        final Female other = (Female) obj;
         if (this.id==null) {
             if (other.id!=null) {
                 return false;
@@ -63,7 +51,6 @@ public class Person {
 
     @Override
     public String toString() {
-        return "Person{" + "id=" + id + '}';
-    }    
-    
+        return "Female{" + "id=" + id + '}';
+    }
 }

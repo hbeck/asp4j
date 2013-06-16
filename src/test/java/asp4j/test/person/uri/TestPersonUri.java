@@ -28,7 +28,7 @@ import org.openrdf.model.impl.URIImpl;
  *
  * @author hbeck date June 2, 2013
  */
-public class TestPersonAnnotatedUri {
+public class TestPersonUri {
 
     private final String rulefile_common = System.getProperty("user.dir") + "/src/test/common/person.lp";
     private final String rulefile_dlv = System.getProperty("user.dir") + "/src/test/dlv/person.lp";

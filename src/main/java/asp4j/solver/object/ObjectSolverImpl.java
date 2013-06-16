@@ -8,6 +8,12 @@ import asp4j.program.ProgramBuilder;
 import asp4j.solver.ReasoningMode;
 import asp4j.solver.Solver;
 import asp4j.solver.SolverException;
+import asp4j.solver.object.query.ObjectBooleanQuery;
+import asp4j.solver.object.query.ObjectTupleQuery;
+import asp4j.solver.object.query.ObjectTupleQueryResult;
+import asp4j.solver.query.BooleanQuery;
+import asp4j.solver.query.TupleQuery;
+import asp4j.solver.query.TupleQueryResult;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -114,4 +120,25 @@ public class ObjectSolverImpl implements ObjectSolver {
             throw new SolverException(e);
         }
     }
+
+    @Override
+    public boolean booleanQuery(Program<Object> program, BooleanQuery query, ReasoningMode reasoningMode) {
+        throw new UnsupportedOperationException("Not supported yet."); //TODO
+    }
+
+    @Override
+    public boolean booleanQuery(Program<Object> program, ObjectBooleanQuery query, ReasoningMode reasoningMode) {
+        throw new UnsupportedOperationException("Not supported yet."); //TODO
+    }
+
+    @Override
+    public TupleQueryResult tupleQuery(Program<Object> program, TupleQuery query, ReasoningMode reasoningMode) {
+        throw new UnsupportedOperationException("Not supported yet."); //TODO
+    }
+
+    @Override
+    public ObjectTupleQueryResult tupleQuery(Program<Object> program, ObjectTupleQuery query, ReasoningMode reasoningMode) {
+        throw new UnsupportedOperationException("Not supported yet."); //TODO
+    }
+
 }

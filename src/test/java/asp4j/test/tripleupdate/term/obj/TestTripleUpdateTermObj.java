@@ -29,7 +29,7 @@ import org.openrdf.model.impl.URIImpl;
  *
  * @author hbeck June 8, 2013
  */
-public class TestTripleUpdateAnnotatedTermObj {
+public class TestTripleUpdateTermObj {
 
     private final String rulefile_common = System.getProperty("user.dir") + "/src/test/common/triple-update-term-obj.lp";
     

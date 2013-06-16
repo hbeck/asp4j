@@ -1,13 +1,13 @@
 package asp4j.test.tripleupdate.term.obj;
 
-import asp4j.mapping.annotations.DefEnumConstants;
+import asp4j.mapping.annotations.DefConstantSymbols;
 import asp4j.mapping.annotations.MapAs;
 
 /**
  *
  * @author hbeck Jun 8, 2013
  */
-@DefEnumConstants
+@DefConstantSymbols
 public enum ConflictType {
     
     @MapAs("single_violation") single_violation, //redundancy test

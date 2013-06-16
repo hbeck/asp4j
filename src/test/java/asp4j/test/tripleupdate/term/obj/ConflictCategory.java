@@ -1,13 +1,13 @@
 package asp4j.test.tripleupdate.term.obj;
 
-import asp4j.mapping.annotations.DefEnumAtoms;
+import asp4j.mapping.annotations.DefPredicateSymbols;
 import asp4j.mapping.annotations.MapAs;
 
 /**
  *
  * @author hbeck Jun 8, 2013
  */
-@DefEnumAtoms
+@DefPredicateSymbols
 public enum ConflictCategory {
     
     //use default name for conflict

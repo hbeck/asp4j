@@ -15,8 +15,8 @@ import asp4j.mapping.MappingException;
 import asp4j.mapping.annotations.Arg;
 import asp4j.mapping.annotations.DefAtom;
 import asp4j.mapping.annotations.DefConstant;
-import asp4j.mapping.annotations.DefEnumAtoms;
-import asp4j.mapping.annotations.DefEnumConstants;
+import asp4j.mapping.annotations.DefConstantSymbols;
+import asp4j.mapping.annotations.DefPredicateSymbols;
 import asp4j.mapping.annotations.DefTerm;
 import asp4j.mapping.object.AnyMapping;
 import asp4j.mapping.object.HasTargetNames;
@@ -63,7 +63,7 @@ public class Binding {
     /**
      * add implicit mapping for given class. mapping is derived by annotations
      * of this class.
-
+     *
      */
     public <T> Binding add(Class<T> clazz) throws MappingException {
         registry.add(clazz);
@@ -207,9 +207,9 @@ public class Binding {
 
         private void addEnum(Class clazz) {
             Mapping<?, ?> mapping;
-            if (clazz.isAnnotationPresent(DefEnumAtoms.class)) {
+            if (clazz.isAnnotationPresent(DefPredicateSymbols.class)) {
                 mapping = new AtomEnumMapping(clazz);
-            } else if (clazz.isAnnotationPresent(DefEnumConstants.class)) {
+            } else if (clazz.isAnnotationPresent(DefConstantSymbols.class)) {
                 mapping = new ConstantEnumMapping(clazz);
             } else {
                 return;
@@ -275,15 +275,15 @@ public class Binding {
             return getOutputMapping(clazz);
         }
 
-        private <T, E extends LangElem> OutputMapping<T,E> getOutputMapping(Class<T> clazz) throws MappingException {
+        private <T, E extends LangElem> OutputMapping<T, E> getOutputMapping(Class<T> clazz) throws MappingException {
             OutputMapping<?, ?> mapping = outputMappings.get(clazz);
             if (mapping != null) {
-                return (OutputMapping<T,E>) mapping;
+                return (OutputMapping<T, E>) mapping;
             }
             for (Class<?> candidateClass : clazz.getInterfaces()) {
                 mapping = outputMappings.get(candidateClass);
                 if (mapping != null) {
-                    return (OutputMapping<T,E>) mapping;
+                    return (OutputMapping<T, E>) mapping;
                 }
             }
             throw new MappingException("no output mapping found for " + clazz);
@@ -300,21 +300,7 @@ public class Binding {
 
                 @Override
                 public Atom asLangElem(T t) throws MappingException {
-                    Map<Integer, Term> termMap = new HashMap<>();
-                    try {
-                        for (Method method : clazz.getMethods()) {
-                            Arg argAnnotation = method.getAnnotation(Arg.class);
-                            if (argAnnotation == null) {
-                                continue;
-                            }
-                            int arg = argAnnotation.value();
-                            Object returnedObject = method.invoke(t);
-                            termMap.put(Integer.valueOf(arg), (Term) mapAsLangElem(returnedObject));
-                        }
-                    } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-                        throw new MappingException(e);
-                    }
-                    return new AtomImpl(predicateSymbol, asArray(termMap));
+                    return new AtomImpl(predicateSymbol, termArray(clazz, t));
                 }
 
                 @Override
@@ -330,6 +316,27 @@ public class Binding {
             };
         }
 
+        private <T> Term[] termArray(final Class<T> clazz, T t) throws MappingException {
+            Map<Integer, Term> termMap = new HashMap<>();
+            for (Method method : clazz.getMethods()) {
+                if (method.isAnnotationPresent(Arg.class)) {
+                    doAnnotationArg(termMap, method, t);
+                }
+            }
+            return asArray(termMap);
+        }
+
+        private <T> void doAnnotationArg(Map<Integer, Term> termMap, Method method, T t) throws MappingException {
+            try {
+                Arg argAnnotation = method.getAnnotation(Arg.class);
+                int arg = argAnnotation.value();
+                Object returnedObject = method.invoke(t);
+                termMap.put(Integer.valueOf(arg), (Term) mapAsLangElem(returnedObject));
+            } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+                throw new MappingException(e);
+            }
+        }
+
         private <T> TermMapping<T> createTermMapping(final Class<T> clazz) {
             return new TermMapping<T>() {
                 @Override
@@ -340,21 +347,7 @@ public class Binding {
 
                 @Override
                 public Term asLangElem(T t) throws MappingException {
-                    Map<Integer, Term> termMap = new HashMap<>();
-                    try {
-                        for (Method method : clazz.getMethods()) {
-                            Arg argAnnotation = method.getAnnotation(Arg.class);
-                            if (argAnnotation == null) {
-                                continue;
-                            }
-                            int arg = argAnnotation.value();
-                            Object returnedObject = method.invoke(t);
-                            termMap.put(Integer.valueOf(arg), (Term) mapAsLangElem(returnedObject));
-                        }
-                    } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-                        throw new MappingException(e);
-                    }
-                    return new TermImpl(symbol(), asArray(termMap));
+                    return new TermImpl(symbol(), termArray(clazz, t));
                 }
 
                 @Override

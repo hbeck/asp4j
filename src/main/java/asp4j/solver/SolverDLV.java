@@ -1,5 +1,10 @@
 package asp4j.solver;
 
+import asp4j.lang.Atom;
+import asp4j.program.Program;
+import asp4j.solver.query.BooleanQuery;
+import asp4j.solver.query.TupleQuery;
+import asp4j.solver.query.TupleQueryResult;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -48,4 +53,5 @@ public class SolverDLV extends SolverBase {
     protected String atomDelimiter() {
         return ", ";
     }
+
 }

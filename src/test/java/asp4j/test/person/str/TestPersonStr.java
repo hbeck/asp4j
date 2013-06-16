@@ -1,4 +1,4 @@
-package asp4j.test.person;
+package asp4j.test.person.str;
 
 import asp4j.lang.AnswerSet;
 import asp4j.program.Program;
@@ -24,7 +24,7 @@ import org.junit.Test;
  *
  * @author hbeck date May 20, 2013
  */
-public class TestPersonAnnotated {
+public class TestPersonStr {
 
     private final String rulefile_common = System.getProperty("user.dir") + "/src/test/common/person.lp";
     private final String rulefile_dlv = System.getProperty("user.dir") + "/src/test/dlv/person.lp";

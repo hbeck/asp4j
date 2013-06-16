@@ -26,7 +26,7 @@ import org.openrdf.model.impl.URIImpl;
  *
  * @author hbeck date May 14, 2013
  */
-public class TestTripleUpdateAnnotatedFlatStr {
+public class TestTripleUpdateFlatStr {
 
     private final String rulefile_common = System.getProperty("user.dir") + "/src/test/common/triple-update-flat-str.lp";
 

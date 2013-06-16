@@ -13,11 +13,10 @@ import asp4j.solver.object.ObjectSolverImpl;
 import java.io.File;
 import java.util.List;
 import java.util.Set;
-import org.junit.Test;
 import org.apache.commons.collections.CollectionUtils;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import org.junit.Test;
 
 /**
  *
@@ -40,14 +39,14 @@ public class TestReach {
     public void test(Solver externalSolver, String rulefile) throws Exception {
 
         /*
-         * reach(X,Y) :- edge(X,Y), not blocked(X).
+         * reach(X,Y) :- edge(X,Y), not blocked(X,Y).
          * reach(X,Z) :- reach(X,Y), reach(Y,Z).
          * 
          * //1
          * edge(node(a),node(b)). edge(node(b),node(c)). edge(node(c),node(d)).
          * 
          * //2
-         * blocked(node(c)).
+         * blocked(node(c),node(d)).
          * 
          * //3
          * edge(node(b),node(d)).
@@ -81,7 +80,7 @@ public class TestReach {
         assertTrue(CollectionUtils.isEqualCollection(cautiousCons, as));
 
         //2
-        program = new ProgramBuilder<>(program).add(new Blocked("c")).build();
+        program = new ProgramBuilder<>(program).add(new Blocked("c","d")).build();
         answerSets = solver.getAnswerSets(program, filter);
 
         assertEquals(1, answerSets.size());

@@ -30,6 +30,7 @@ public class PersonGender {
         this.id=id;
     }
 
+    //TODO throw exception on unknown value, e.g. gender(id42,id42)
     @Arg(1)
     public Gender getGender() {
         return gender;

@@ -6,37 +6,45 @@ import java.util.Objects;
 
 /**
  *
- * @author hbeck Jun 9, 2013
+ * @author hbeck Jun 10, 2013
  */
 @DefAtom("blocked")
 public class Blocked {
     
-    private Node node;
+    private Node from;
+    private Node to;
 
     public Blocked() {
     }
-    
-    public Blocked(String node) {
-        this.node = new Node(node);
-    }
 
-    public Blocked(Node node) {
-        this.node = node;
+    public Blocked(String from, String to) {
+        this.from = new Node(from);
+        this.to = new Node(to);
     }
 
     @Arg(0)
-    public Node getNode() {
-        return node;
+    public Node getFrom() {
+        return from;
     }
 
-    public void setNode(Node node) {
-        this.node = node;
+    public void setFrom(Node from) {
+        this.from = from;
+    }
+
+    @Arg(1)
+    public Node getTo() {
+        return to;
+    }
+
+    public void setTo(Node to) {
+        this.to = to;
     }
 
     @Override
     public int hashCode() {
-        int hash = 3;
-        hash = 97 * hash + Objects.hashCode(this.node);
+        int hash = 7;
+        hash = 23 * hash + Objects.hashCode(this.from);
+        hash = 23 * hash + Objects.hashCode(this.to);
         return hash;
     }
 
@@ -49,17 +57,18 @@ public class Blocked {
             return false;
         }
         final Blocked other = (Blocked) obj;
-        if (!Objects.equals(this.node, other.node)) {
+        if (!Objects.equals(this.from, other.from)) {
+            return false;
+        }
+        if (!Objects.equals(this.to, other.to)) {
             return false;
         }
         return true;
-    }    
+    }
 
     @Override
     public String toString() {
-        return "Blocked{" + "node=" + node + '}';
-    }
-    
-    
+        return "Blocked{" + "from=" + from + ", to=" + to + '}';
+    }    
 
 }

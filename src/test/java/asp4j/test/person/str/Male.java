@@ -1,4 +1,4 @@
-package asp4j.test.person;
+package asp4j.test.person.str;
 
 import asp4j.mapping.annotations.DefAtom;
 import java.util.Objects;

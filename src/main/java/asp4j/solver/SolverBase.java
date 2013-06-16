@@ -5,6 +5,9 @@ import asp4j.lang.AnswerSetImpl;
 import asp4j.lang.Atom;
 import asp4j.util.ParseUtils;
 import asp4j.program.Program;
+import asp4j.solver.query.BooleanQuery;
+import asp4j.solver.query.TupleQuery;
+import asp4j.solver.query.TupleQueryResult;
 import java.io.File;
 import java.io.IOException;
 import java.text.ParseException;
@@ -79,8 +82,8 @@ public abstract class SolverBase implements Solver {
             postSolverExec(program);
             return lastProgramAnswerSets = Collections.unmodifiableList(mapAnswerSetStrings(answerSetStrings));
         } catch (IOException | ParseException e) {
-          throw new SolverException(e);
-        } 
+            throw new SolverException(e);
+        }
     }
 
     /**
@@ -173,7 +176,7 @@ public abstract class SolverBase implements Solver {
             sb.append(atom.toString());
         }
         try {
-            FileUtils.writeStringToFile(tempInputFile(),sb.toString());
+            FileUtils.writeStringToFile(tempInputFile(), sb.toString());
         } catch (IOException ex) {
             throw new SolverException(ex);
         }
@@ -183,5 +186,15 @@ public abstract class SolverBase implements Solver {
      * executed after call to solver
      */
     protected void postSolverExec(Program<Atom> program) {
+    }
+
+    @Override
+    public boolean booleanQuery(Program<Atom> program, BooleanQuery query, ReasoningMode reasoningMode) {
+        throw new UnsupportedOperationException("Not supported yet."); //TODO
+    }
+
+    @Override
+    public TupleQueryResult tupleQuery(Program<Atom> program, TupleQuery query, ReasoningMode reasoningMode) {
+        throw new UnsupportedOperationException("Not supported yet."); //TODO
     }
 }

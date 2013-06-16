@@ -1,3 +1,7 @@
+0.0.6
+
+- query support
+
 0.0.5 2013-06-09
 
 - cleanup

@@ -1,6 +1,6 @@
 package asp4j.test.tripleupdate.term.obj;
 
-import asp4j.mapping.annotations.DefEnumConstants;
+import asp4j.mapping.annotations.DefConstantSymbols;
 import asp4j.mapping.annotations.MapAs;
 
 /**
@@ -8,7 +8,7 @@ import asp4j.mapping.annotations.MapAs;
  *
  * @author hbeck Jun 9, 2013
  */
-@DefEnumConstants
+@DefConstantSymbols
 public enum Predicate {
     
     owl_inverseOf("owl:inverseOf"),
